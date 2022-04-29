@@ -6,7 +6,7 @@ import thunk from 'redux-thunk';
 import persistStore from 'redux-persist/es/persistStore';
 
 const persistConfig = {
-  key: 'counter',
+  key: 'acount',
   storage: AsyncStorage,
 };
 // const rootReducer = combineReducers({
