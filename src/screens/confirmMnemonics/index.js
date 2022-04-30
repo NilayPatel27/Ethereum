@@ -1,59 +1,54 @@
-import {View, Text, TouchableOpacity, StyleSheet, Dimensions} from 'react-native';
-import React, {useState, useEffect} from 'react';
+import {View, Text, TouchableOpacity, StyleSheet, Dimensions,Alert} from 'react-native';
+import React, {useRef} from 'react';
 import _ from 'lodash';
+import ConfirmBox from './confirmBox';
+import { ethers } from 'ethers';
 const windowWidth = Dimensions.get('window').width;
 
 const ConfirmMnemonics = ({navigation, route}) => {
   const {mnemonic} = route.params;
-  const [shuffle, setshuffle] = useState(false);
+  const Confirm = useRef();
+  const onPressConfirm = () => {
+    // if (!Confirm.current.isValidSequence()) {
+    //   Alert.alert('Invalid sequence', 'Please select the correct sequence');
+    //   return null;
+    // }
+    const wallet = loadWalletFromMnemonics(mnemonic);
+    console.log(wallet.privateKey);
+    navigation.navigate('HomePage',{wallet});
+    console.log('Confirm');
+  };
+const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
 
-  const [state, setState] = useState({
-    selectable: mnemonic,
-    selected: [],
-  });
-  useEffect(() => {
-    setState({
-      ...state,
-      selectable: _.shuffle([...state.selectable]),
-    });
-    setshuffle(true);
-  }, []);
-  const renderMnemonic = (mnemonic, index) => (
-    <View style={{margin: 4}} key={index}>
-      <View style={styles.renderMnemonic}>
-        <Text style={{color: '#000', fontSize: 16, fontWeight: '600'}}>
-          {mnemonic}
-        </Text>
-      </View>
-    </View>
-  );
-  // console.log(mnemonic,res)
+  const loadWalletFromMnemonics =(mnemonics) => {
+    console.log(mnemonics);
+    console.log(!(mnemonics instanceof Array));
+    console.log(typeof mnemonics !== 'string');
+    if (!(mnemonics instanceof Array) && typeof mnemonics !== 'string')
+      throw new Error('invalid mnemonics');
+    else if (mnemonics instanceof Array) {
+      mnemonics = mnemonics.join(' ');
+      console.log('else if');
+    }
+    console.log(typeof mnemonics == 'string');
+    console.log(mnemonics);
+    // console.log(ethers.utils.isValidMnemonic(mnemonics));
+    let wallet1 =  ethers.Wallet.fromMnemonic(mnemonics);
+    wallet1 = wallet1.connect(PROVIDER);
+    // console.log(wallet1)
+    return wallet1;
+  }
+  
   return (
     <>
-            {shuffle && <>
-    <View
-        style={{
-          flex: 1,
-          justifyContent: 'space-evenly',
-          alignItems: 'center',
-          flexDirection: 'column',
-          padding: 8,
-          backgroundColor: '#14213D',
-        }}>
-          <View style={styles.mnemonicsContainer}>
-              {state.selectable.map((mnemonic, index) =>
-                renderMnemonic(mnemonic, index),
-              )}
-            </View>
-      
-      </View></>}
-      {shuffle &&<View style={{backgroundColor: '#14213D', paddingBottom: 10}}>
+        <ConfirmBox ref={Confirm} mnemonic={mnemonic} />
+        <View style={{backgroundColor: '#14213D', paddingBottom: 10}}>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate('ConfirmMnemonics')}>
-              <Text style={styles.title}>Proceed</Text>
+              onPress={onPressConfirm}>
+              <Text style={styles.title}>Confirm</Text>
             </TouchableOpacity>
-          </View>}
+          </View>
     </>
   );
 };

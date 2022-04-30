@@ -20,7 +20,8 @@ const CreateMnemonics = ({navigation}) => {
 
   useEffect(() => {
     const mnemonics = entropyToMnemonic(randomBytes(16));
-    const myArray = mnemonics.split(' ');
+    let myArray = mnemonics.split(' ');
+    console.log(myArray);
     setmnemonics(myArray);
     setres(true);
   }, []);
