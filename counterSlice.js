@@ -4,7 +4,7 @@ export const counterSlice = createSlice({
   name: 'counter',
   initialState: {
     value: 0,
-    array: '',
+    array: [],
   },
   reducers: {
     increment: state => {
@@ -21,7 +21,23 @@ export const counterSlice = createSlice({
       state.value += action.payload;
     },
     addressArray: (state, action) => {
-      state.array += action.payload;
+      state.array.push(action.payload);
+      let arr = state.array;
+      for(let i = 0; i < arr.length; i++){
+        if(arr[i].address === action.payload.name){
+          arr.splice(i,1);
+        }
+      }
+      arr = [...new Set(arr)];
+      // console.log(arr[0].balance);
+      // arr[0].balance= 3;
+      // console.log('bal',arr[0].balance);
+
+      // arr.splice(0,1);
+      // console.log('arr',arr);
+      state.array = arr;
+
+      // state.array += action.payload;
     }
   },
 });
@@ -37,6 +53,8 @@ export const incrementAsync = amount => dispatch => {
     dispatch(incrementByAmount(amount));
   }, 1000);
 };
+// export const addAddress = address => dispatch => {
+
 
 // The function below is called a selector and allows us to select a value from
 // the state. Selectors can also be defined inline where they're used instead of

@@ -11,7 +11,7 @@ import HomePage from '../src/screens/homePage';
 import Ethereum from '../src/screens/ethereum';
 import ImportAccount from '../src/screens/importAccount';
 import RBSheet from "react-native-raw-bottom-sheet";
-
+import WalletPage from '../src/screens/ethereum/walletPage';
 
 const Stack = createNativeStackNavigator();
 
@@ -77,6 +77,7 @@ const [privateKey, setprivateKey] = useState('');
           )} 
           )} component={Ethereum} />
           <Stack.Screen name="ImportAccount" component={ImportAccount} />
+          <Stack.Screen name="WalletPage" component={WalletPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );
