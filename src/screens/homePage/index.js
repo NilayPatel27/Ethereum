@@ -1,24 +1,38 @@
-import {View, Text, FlatList, TouchableOpacity} from 'react-native';
+import {View, Text, FlatList, TouchableOpacity, Button} from 'react-native';
 import React,{useEffect,useState} from 'react';
 import {ethers} from 'ethers';
+import 'react-native-get-random-values';
+import '@ethersproject/shims';
+import randomBytes from 'randombytes';
+import {entropyToMnemonic} from '@ethersproject/hdnode'
+import { useDispatch, useSelector } from 'react-redux';
+import { selectLogin } from '../../../counterSlice';
+import {addressArray,selectAddress,selectView} from '../../../counterSlice';
+import converter from 'number-to-words';
+import {view} from '../../../counterSlice';
+import Dash from 'react-native-dash';
 
 const HomePage = ({navigation, route}) => {
-  // const {wallet} = route.params;
-  // console.log(route.params.wallet);
-  // for (const [key, value] of Object.entries(route.params.wallet.provider._network)) {
-  //     console.log(`${key}: ${value}`);
-  //   }
-
-
-//   const accoutBalance = bal();
-
-//   console.log('ab', accoutBalance);
-  
-
-const [balances, setbalances] = useState(null);
+  const dispatch = useDispatch();
+  const login =useSelector(selectLogin);
+  var sideview = useSelector(selectView);
+  var address = useSelector(selectAddress);
+  const [balances, setbalances] = useState(null);
 
 useEffect(() => {
     bal();
+    console.log('sideview',sideview);
+    let obj = {
+      name: converter.toWordsOrdinal(address.length),
+      address:route.params.wallet.address,
+    }
+    for(let i = 0; i < address.length; i++){
+      if(address[i].address === route.params.wallet.address){
+        return;
+      }
+    }
+
+    dispatch(addressArray(obj));
 }, [])
 
 const array = [
@@ -33,7 +47,6 @@ const array = [
     setbalances(Number(balance));
     return balance;
   };
-
   const renderItem = ({item, index}) => {
     return (
       <>
@@ -56,6 +69,7 @@ const array = [
         <Text style={{fontSize:20,color:"#000"}}>{item.balance}</Text>
           </View>
         </TouchableOpacity>
+        
       </>
     );
   };

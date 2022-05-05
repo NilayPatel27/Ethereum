@@ -1,7 +1,7 @@
 import {View, Text, TouchableOpacity, StyleSheet, Dimensions,Alert} from 'react-native';
 import React, {useRef} from 'react';
 import _ from 'lodash';
-import ConfirmBox from './confirmBox';
+import ConfirmBox from './ConfirmBox';
 import { ethers } from 'ethers';
 const windowWidth = Dimensions.get('window').width;
 
@@ -45,7 +45,7 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
         <View style={{backgroundColor: '#14213D', paddingBottom: 10}}>
             <TouchableOpacity
               style={styles.button}
-              onPress={onPressConfirm}>
+              onPress={()=>onPressConfirm()}>
               <Text style={styles.title}>Confirm</Text>
             </TouchableOpacity>
           </View>
