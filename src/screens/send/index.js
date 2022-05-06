@@ -39,6 +39,7 @@ const SendEther = ({navigation,route}) => {
         setCamera(false);
         console.log('data',data);
         console.log(data.length)
+        setaddress(data);
        const valid= ethers.utils.isAddress(data);
          console.log('valid',valid);
          setvalid(valid);
@@ -83,7 +84,7 @@ const SendEther = ({navigation,route}) => {
                         {valid==false && addressTo.length>0?<Text style={{textAlign:'center',color:"red"}}>Enter Valid Address</Text>:null}
         </View>
         {valid ==true? <View style={styles.buttonsContainer}>
-            <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('CreateMnemonics')}>
+            <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('AmountPage',{addressTo,address,name})}>
                 <Text style={styles.title} >Continue</Text>
             </TouchableOpacity>
         </View>:null}

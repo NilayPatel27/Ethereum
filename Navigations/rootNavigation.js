@@ -16,7 +16,8 @@ import { useDispatch } from 'react-redux';
 import { view } from '../counterSlice';
 import BuyEther from '../src/screens/buyEther';
 import SendEther from '../src/screens/send/index';
-
+import AmountPage from '../src/screens/confirmTransaction/amountPage';
+import CofirmTransaction from '../src/screens/confirmTransaction/cofirmTransaction';
 const Stack = createNativeStackNavigator();
 
 const screenOptions = {
@@ -47,6 +48,8 @@ const dispatch = useDispatch();
         <Stack.Screen name="CreateMnemonics" component={CreateMnemonics} />
         <Stack.Screen name="ConfirmMnemonics" component={ConfirmMnemonics} />
         <Stack.Screen name="ConfirmBox" component={ConfirmBox} />
+        <Stack.Screen name="AmountPage" component={AmountPage} />
+        <Stack.Screen name="CofirmTransaction" component={CofirmTransaction} />
         <Stack.Screen name="HomePage" options={({navigation}) => ({
           headerTitle: 'HomePage',
           headerRight: () => (

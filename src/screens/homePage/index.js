@@ -22,9 +22,11 @@ const HomePage = ({navigation, route}) => {
 useEffect(() => {
     bal();
     console.log('sideview',sideview);
+    console.log('wallet',route.params.wallet);
     let obj = {
       name: converter.toWordsOrdinal(address.length),
       address:route.params.wallet.address,
+      wallet:route.params.wallet
     }
     for(let i = 0; i < address.length; i++){
       if(address[i].address === route.params.wallet.address){

@@ -74,7 +74,7 @@ const WalletPage = ({navigation,route}) => {
           setbalances(res.data.result);
       });
 
-      axios.get(`https://api-ropsten.etherscan.io/api?module=account&action=txlist&address=0xBcdB411D7959B1bBF2DFCbb83942433c74f6892d&startblock=0&endblock=99999999&page=1&offset=999&sort=asc&apikey=349IQMJ71CEBWJ65I1U5G5N5NG43C37UZB`).then(res => {
+      axios.get(`https://api-ropsten.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=999&sort=desc&apikey=349IQMJ71CEBWJ65I1U5G5N5NG43C37UZB`).then(res => {
         // console.log(res.data.result)
         settransaction(res.data.result);
         setres(true);
@@ -130,7 +130,7 @@ const WalletPage = ({navigation,route}) => {
                 data={transaction}
                 renderItem={({item,index}) => (
                     <>
-                    {item.to=='0xbcdb411d7959b1bbf2dfcbb83942433c74f6892d'
+                    {item.to==address
                     ?<View style={{flexDirection:"row",justifyContent:"center",alignItems:"center",width:'100%',backgroundColor:"transparent",height:100}} onLayout={(event)=>onLayout(event)}>
                         <View style={{width:'100%',height:"100%",justifyContent:"space-evenly",flexDirection:"column",padding:6,paddingLeft:5,backgroundColor:"#f5f5f5",borderRadius:6}}>
                             <View style={{alignItems:"flex-start",flexDirection:"row",justifyContent:"space-between",height:"50%",backgroundColor:"transparent"}}>
@@ -255,7 +255,6 @@ const WalletPage = ({navigation,route}) => {
   return (
       <>
     <View style={{flex:1,backgroundColor:"#14213D",padding:15}}>
-        {/* first view */}
         {sideview==true?
         <Animated.View style={{transform: [{ translateX: pan.x }, { translateY: pan.y }],flexDirection:"row",justifyContent:"space-between",width:"100%",height:"30%"}} {...panResponder.panHandlers} >
             <View style={{width:"70%",height:"100%",backgroundColor:"lightblue",flexDirection:'row',justifyContent:'flex-start',alignItems:"center",borderTopLeftRadius:10,borderBottomLeftRadius:10}}>
@@ -357,7 +356,6 @@ const WalletPage = ({navigation,route}) => {
       initialLayout={initialLayout}
       style={style.containers}
       tabBarPosition="top"
-    //   renderTabBar={props => <TabBar {...props} style={{backgroundColor: 'orange',color:'#000'}}/>} // <-- add this line
       renderTabBar={renderTabBar}
 
     />
@@ -381,7 +379,7 @@ const WalletPage = ({navigation,route}) => {
         <View style={style.container}>
                 <Text style={style.centered}>Show the code below to receive coins</Text>
                 <View style={style.centered}>
-                    <QRCode size={200} value={address} /> //size-size of QR code in pixels
+                    <QRCode size={200} value={address} /> 
                 </View>
                 <Text style={style.centered}>{address}</Text>
                 <View style={style.actions}>

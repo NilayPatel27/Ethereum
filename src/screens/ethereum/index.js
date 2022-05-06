@@ -82,9 +82,11 @@ const Ethereum = ({navigation, route}) => {
     let wallet = new ethers.Wallet(privateKey);
     wallet= wallet.connect(ethers.getDefaultProvider('ropsten'));
     console.log(wallet.address);
+    console.log(wallet);
     let obj = {
       name: converter.toWordsOrdinal(address.length),
       address:wallet.address,
+      wallet:wallet
     }
     console.log(obj);
     for(let i = 0; i < address.length; i++){
