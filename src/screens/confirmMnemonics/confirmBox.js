@@ -1,6 +1,7 @@
-import { View, Text, StyleSheet,Dimensions,TouchableOpacity } from 'react-native'
-import React,{useState,useEffect,useImperativeHandle, forwardRef} from 'react';
 import _ from 'lodash';
+import React,{useState,useEffect,useImperativeHandle, forwardRef} from 'react';
+import { View, Text, StyleSheet,Dimensions,TouchableOpacity } from 'react-native'
+
 const windowWidth = Dimensions.get('window').width;
 
 const ConfirmBox = ({navigation,mnemonic},ref) => {

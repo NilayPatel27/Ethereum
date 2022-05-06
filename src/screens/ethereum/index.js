@@ -1,20 +1,15 @@
-import {View, Text, Dimensions, Image, TouchableOpacity,ToastAndroid,Button, FlatList,TextInput,StyleSheet} from 'react-native';
-import React ,{useRef,useEffect,useState}from 'react';
-import Carousel from 'react-native-snap-carousel';
-import Clipboard from '@react-native-community/clipboard';
-import RBSheet from "react-native-raw-bottom-sheet";
-import {useSelector, useDispatch} from 'react-redux';
-import {addressArray,selectAddress} from '../../../counterSlice';
-import { ethers } from 'ethers';
-import { sortedIndex } from 'lodash';
-import converter from 'number-to-words'
 import axios from 'axios';
-import 'react-native-get-random-values';
 import '@ethersproject/shims';
+import { ethers } from 'ethers';
 import randomBytes from 'randombytes';
-import {entropyToMnemonic} from '@ethersproject/hdnode';
-import {login} from '../../../counterSlice';
 import Modal from 'react-native-modal';
+import 'react-native-get-random-values';
+import converter from 'number-to-words';
+import {useSelector, useDispatch} from 'react-redux';
+import React ,{useRef,useEffect,useState}from 'react';
+import Clipboard from '@react-native-community/clipboard';
+import {addressArray,selectAddress} from '../../../counterSlice';
+import {View, Text, Dimensions, Image, TouchableOpacity,ToastAndroid, FlatList, StyleSheet} from 'react-native';
 
 
 let width = Dimensions.get('window').width.toFixed() * 0.8;
@@ -80,7 +75,7 @@ const Ethereum = ({navigation, route}) => {
     let privateKey = '0x' + id;
     // console.log(privateKey);
     let wallet = new ethers.Wallet(privateKey);
-    wallet= wallet.connect(ethers.getDefaultProvider('ropsten'));
+    wallet= wallet.connect(ethers.providers.getDefaultProvider('ropsten'));
     console.log(wallet.address);
     console.log(wallet);
     let obj = {

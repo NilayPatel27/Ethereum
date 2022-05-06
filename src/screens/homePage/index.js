@@ -1,20 +1,12 @@
-import {View, Text, FlatList, TouchableOpacity, Button} from 'react-native';
-import React,{useEffect,useState} from 'react';
 import {ethers} from 'ethers';
-import 'react-native-get-random-values';
-import '@ethersproject/shims';
-import randomBytes from 'randombytes';
-import {entropyToMnemonic} from '@ethersproject/hdnode'
-import { useDispatch, useSelector } from 'react-redux';
-import { selectLogin } from '../../../counterSlice';
-import {addressArray,selectAddress,selectView} from '../../../counterSlice';
 import converter from 'number-to-words';
-import {view} from '../../../counterSlice';
-import Dash from 'react-native-dash';
+import React,{useEffect,useState} from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {View, Text, FlatList, TouchableOpacity} from 'react-native';
+import {addressArray,selectAddress,selectView} from '../../../counterSlice';
 
 const HomePage = ({navigation, route}) => {
   const dispatch = useDispatch();
-  const login =useSelector(selectLogin);
   var sideview = useSelector(selectView);
   var address = useSelector(selectAddress);
   const [balances, setbalances] = useState(null);
@@ -33,7 +25,6 @@ useEffect(() => {
         return;
       }
     }
-
     dispatch(addressArray(obj));
 }, [])
 

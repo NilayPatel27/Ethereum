@@ -1,7 +1,7 @@
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
-import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import { ethers } from 'ethers';
+import React, { useEffect, useState } from 'react'
+import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
 
 const AmountPage = ({navigation,route}) => {
     const {addressTo ,address,name} = route.params;

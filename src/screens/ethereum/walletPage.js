@@ -1,16 +1,14 @@
-import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet, ToastAndroid, Share ,TouchableWithoutFeedback,ActivityIndicator,Animated,PanResponder,Dimensions,StatusBar} from 'react-native'
-import React,{useState,useEffect,useRef} from 'react'
 import axios from 'axios';
+import moment from 'moment';
 import { ethers } from 'ethers';
 import Modal from 'react-native-modal';
-import QRCode from 'react-native-qrcode-svg';
-import Clipboard from '@react-native-community/clipboard';
-import {selectView} from '../../../counterSlice';
 import { useSelector } from 'react-redux';
-import Dash from 'react-native-dash';
-import moment from 'moment';
-import RBSheet from "react-native-raw-bottom-sheet";
+import QRCode from 'react-native-qrcode-svg';
+import {selectView} from '../../../counterSlice';
+import React,{useState,useEffect,useRef} from 'react'
+import Clipboard from '@react-native-community/clipboard';
 import { TabView, SceneMap,TabBar} from 'react-native-tab-view';
+import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet, ToastAndroid, Share ,TouchableWithoutFeedback,ActivityIndicator,Animated,PanResponder,Dimensions,StatusBar} from 'react-native'
 
 const WalletPage = ({navigation,route}) => {
     const pan = useRef(new Animated.ValueXY()).current;

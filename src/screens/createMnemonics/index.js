@@ -1,17 +1,16 @@
+import '@ethersproject/shims';
+import randomBytes from 'randombytes';
+import 'react-native-get-random-values';
+import React, {useState, useEffect} from 'react';
+import {entropyToMnemonic} from '@ethersproject/hdnode';
 import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import 'react-native-get-random-values';
-import '@ethersproject/shims';
-import React, {useState, useEffect} from 'react';
-import {entropyToMnemonic} from '@ethersproject/hdnode';
-import randomBytes from 'randombytes';
-import {Divider} from 'react-native-elements/dist/divider/Divider';
+
 const windowWidth = Dimensions.get('window').width;
 
 const CreateMnemonics = ({navigation}) => {

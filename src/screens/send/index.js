@@ -1,17 +1,13 @@
-import { View, Text, TextInput ,KeyboardAvoidingView,Dimensions, Image, ActivityIndicator, TouchableOpacity, Alert,StyleSheet} from 'react-native'
-import React,{useEffect,useState,useRef} from 'react'
 import axios from 'axios';
 import { ethers } from 'ethers';
-// import { Camera, useCameraDevices } from 'react-native-vision-camera';
 import Modal from 'react-native-modal';
+import React,{useEffect,useState,useRef} from 'react'
 import {Camera , CameraType} from 'react-native-camera-kit';
+import { View, Text, TextInput ,Dimensions, Image, TouchableOpacity, StyleSheet} from 'react-native'
 
 const height = (Dimensions.get('window').height)*0.1;
 
 const SendEther = ({navigation,route}) => {
-    // const devices = useCameraDevices();
-    // const device = devices.back;
-    // console.log(device)
     const{address,name} = route.params;
     const [balance, setbalance] = useState(null)
     const [addressTo, setaddress] = useState('')
@@ -22,12 +18,10 @@ const SendEther = ({navigation,route}) => {
     console.log('address',address);
     console.log('name',name);
     useEffect(() => {
-
         axios.get(`https://api-ropsten.etherscan.io/api?module=account&action=balance&address=${address}&apikey=349IQMJ71CEBWJ65I1U5G5N5NG43C37UZB&tag=latest`).then(res => { 
             console.log(res.data.result);
             setbalance(res.data.result);
          });
-        //  permission();
     }, [])
     const permission = async () => {
         const newCameraPermission = await Camera.requestCameraPermission();
@@ -50,37 +44,37 @@ const SendEther = ({navigation,route}) => {
       <>
     <View style={{backgroundColor:"#14213D",height:"100%",width:"100%",flexDirection:"column",justifyContent:"space-between"}}>
         <View>
-        <View style={{height,backgroundColor:"transparent",flexDirection:"row",justifyContent:"center",marginTop:10,padding:10}}>
-            <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"center",flex:1}}>
-                <Text style={{color:"#fff",fontSize:20,fontWeight:"bold",textAlign:"center"}}>From</Text>
-                <View style={{backgroundColor:"#fff",justifyContent:"space-evenly",flexDirection:"column",width:'80%',borderWidth:1,borderColor:'#fff',borderRadius:10,height:"100%"}}>
-                    <Text style={{color:"#2d333a",fontSize:20,fontWeight:"bold",textAlign:"center"}}>{name}</Text>
-                    <Text style={{color:"#2d333a",fontSize:20,fontWeight:"bold",textAlign:"center"}}>Balance : {balance?Number(ethers.utils.formatEther(balance)).toFixed(4):null} ETH</Text>
+            <View style={{height,backgroundColor:"transparent",flexDirection:"row",justifyContent:"center",marginTop:10,padding:10}}>
+                <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"center",flex:1}}>
+                    <Text style={{color:"#fff",fontSize:20,fontWeight:"bold",textAlign:"center"}}>From</Text>
+                    <View style={{backgroundColor:"#fff",justifyContent:"space-evenly",flexDirection:"column",width:'80%',borderWidth:1,borderColor:'#fff',borderRadius:10,height:"100%"}}>
+                        <Text style={{color:"#2d333a",fontSize:20,fontWeight:"bold",textAlign:"center"}}>{name}</Text>
+                        <Text style={{color:"#2d333a",fontSize:20,fontWeight:"bold",textAlign:"center"}}>Balance : {balance?Number(ethers.utils.formatEther(balance)).toFixed(4):null} ETH</Text>
+                    </View>
                 </View>
-            </View>
-        </View>     
-        <View style={{height,backgroundColor:"transparent",flexDirection:"row",justifyContent:"center",padding:10}}>
-            <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"center",flex:1,backgroundColor:"transparent"}}>
-                <Text style={{color:"#fff",fontSize:20,fontWeight:"bold",textAlign:"center"}}>To</Text>
-                <View style={{flexDirection:"row",justifyContent:"space-evenly",alignItems:'center',width:"80%",backgroundColor:"#fff",borderRadius:10}}>
-                    <TextInput
-                        style={{backgroundColor:"#fff",justifyContent:"space-evenly",flexDirection:"column",width:"80%",borderWidth:1,borderColor:'#fff',borderRadius:10,padding:10,height:50}} 
-                        placeholder="Enter Address"
-                        placeholderTextColor="#2d333a"
-                        ref={addres}
-                        onChangeText={(text) => {
-                            setaddress(text);
-                            setvalid(ethers.utils.isAddress(text));
-                        }}
-                    />
-                    <TouchableOpacity onPress={()=>setCamera(true)}>
-                    <Image
-                        style={{width:30,height:30,borderColor:"#fff"}}
-                        source={require('../../assets/PNG/Scan.png')}/>
-                    </TouchableOpacity>
+            </View>     
+            <View style={{height,backgroundColor:"transparent",flexDirection:"row",justifyContent:"center",padding:10}}>
+                <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"center",flex:1,backgroundColor:"transparent"}}>
+                    <Text style={{color:"#fff",fontSize:20,fontWeight:"bold",textAlign:"center"}}>To</Text>
+                    <View style={{flexDirection:"row",justifyContent:"space-evenly",alignItems:'center',width:"80%",backgroundColor:"#fff",borderRadius:10}}>
+                        <TextInput
+                            style={{backgroundColor:"#fff",justifyContent:"space-evenly",flexDirection:"column",width:"80%",borderWidth:1,borderColor:'#fff',borderRadius:10,padding:10,height:50}} 
+                            placeholder="Enter Address"
+                            placeholderTextColor="#2d333a"
+                            ref={addres}
+                            onChangeText={(text) => {
+                                setaddress(text);
+                                setvalid(ethers.utils.isAddress(text));
+                            }}
+                        />
+                        <TouchableOpacity onPress={()=>setCamera(true)}>
+                        <Image
+                            style={{width:30,height:30,borderColor:"#fff"}}
+                            source={require('../../assets/PNG/Scan.png')}/>
+                        </TouchableOpacity>
+                    </View>
                 </View>
-            </View>
-        </View> 
+            </View> 
                         {valid==false && addressTo.length>0?<Text style={{textAlign:'center',color:"red"}}>Enter Valid Address</Text>:null}
         </View>
         {valid ==true? <View style={styles.buttonsContainer}>

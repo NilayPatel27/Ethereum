@@ -1,8 +1,9 @@
 import {View, Text, TouchableOpacity, StyleSheet, Dimensions,Alert} from 'react-native';
 import React, {useRef} from 'react';
 import _ from 'lodash';
-import ConfirmBox from './ConfirmBox';
 import { ethers } from 'ethers';
+import ConfirmBox from './ConfirmBox';
+
 const windowWidth = Dimensions.get('window').width;
 
 const ConfirmMnemonics = ({navigation, route}) => {

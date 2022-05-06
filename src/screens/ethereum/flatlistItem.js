@@ -1,9 +1,7 @@
-import { View, Text,ToastAndroid,TouchableOpacity,Image } from 'react-native'
+import axios from 'axios';
 import React,{useEffect} from 'react';
 import converter from 'number-to-words'
-import axios from 'axios';
-import { ethers } from 'ethers';
-
+import { View, Text,ToastAndroid,TouchableOpacity,Image } from 'react-native'
 
 const FlatlistItem = ({item,index,address}) => {
     
