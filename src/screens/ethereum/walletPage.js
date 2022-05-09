@@ -110,7 +110,7 @@ const WalletPage = ({navigation,route}) => {
           }
           const FirstRoute = () => (
             <>
-            <View style={{flex:1,justifyContent:"flex-start",flexDirection:'column',backgroundColor:"transparent"}}>
+            <View style={{flex:1,justifyContent:"flex-start",flexDirection:'column',backgroundColor:"#fff",padding:10,}}>
             {/* <View style={{height:50,flexDirection:"row",justifyContent:"space-between",backgroundColor:"red"}}>
                 <View style={{height:'100%',width:"50%",backgroundColor:"orange",justifyContent:"center",alignItems:"center"}}>
                     <Text style={{fontSize:20,fontWeight:'bold',color:"#fff"}}>Transactions</Text>
@@ -128,17 +128,23 @@ const WalletPage = ({navigation,route}) => {
                 data={transaction}
                 renderItem={({item,index}) => (
                     <>
-                    {item.to==address
-                    ?<View style={{flexDirection:"row",justifyContent:"center",alignItems:"center",width:'100%',backgroundColor:"transparent",height:100}} onLayout={(event)=>onLayout(event)}>
-                        <View style={{width:'100%',height:"100%",justifyContent:"space-evenly",flexDirection:"column",padding:6,paddingLeft:5,backgroundColor:"#f5f5f5",borderRadius:6}}>
+                    {console.log(item.to,address)}
+                    {item.to== address.toLowerCase()
+                    ?<View style={{flexDirection:"row",justifyContent:"center",alignItems:"center",width:'100%',backgroundColor:"transparent",height:100,}} onLayout={(event)=>onLayout(event)}>
+                        <View style={{width:'100%',height:"100%",justifyContent:"space-evenly",flexDirection:"column",padding:6,paddingLeft:5,backgroundColor:"#202020",borderRadius:6, shadowColor: '#002147',
+          shadowOffset: { width: 0, height: 5 },
+          shadowOpacity: 0.34,
+          shadowRadius: 6.27,
+          elevation: 10,}}>
                             <View style={{alignItems:"flex-start",flexDirection:"row",justifyContent:"space-between",height:"50%",backgroundColor:"transparent"}}>
-                                <View style={{flexDirection:"column",justifyContent:"space-evenly",height:"100%",width:"70%"}}>
-                                    <Text style={style.text}>Hash : {item.hash.slice(0,8)+'...'}</Text>
-                                    <Text style={style.text}>Time : {moment.unix(item.timeStamp).format('DD/MM/YYYY hh:mm:ss')}</Text>
+                                <View style={{flexDirection:"column",justifyContent:"space-evenly",height:"100%",width:"60%"}}>
+                                    {/* <Text style={style.text}>Hash : {item.hash.slice(0,8)+'...'}</Text> */}
+                                    <Text style={style.text}>Date : {moment.unix(item.timeStamp).format('DD/MM/YYYY')}</Text>
+                                    <Text style={style.text}>Time : {moment.unix(item.timeStamp).format('hh:mm:ss')}</Text>
                                 </View>
                                 <View style={{flex:1,height:"100%",backgroundColor:"transparent",flexDirection:"row",alignItems:"center",justifyContent:"space-evenly"}}>
                                     <View style={{flexDirection:"column",justifyContent:'space-between',alignItems:"center",backgroundColor:"transparent",width:"50%"}}>
-                                        <Text style={[style.text,{textAlign:"center"}]}>{item.value?ethers.utils.formatEther(item.value):null}</Text>
+                                        <Text style={[style.text,{textAlign:"center"}]}>{item.value?Number(ethers.utils.formatEther(item.value)).toFixed(4):null}</Text>
                                         <Text style={[style.text,{textAlign:"center"}]}>ETH</Text>
                                     </View>
                                     <Image
@@ -148,27 +154,35 @@ const WalletPage = ({navigation,route}) => {
                                 </View>
                             </View>
                             <View style={{flexDirection:"row",justifyContent:'space-between',backgroundColor:"transparent",flex:1}}>
-                                <View style={{flexDirection:"column",justifyContent:"space-evenly"}}>
-                                    <Text style={style.text}>Block : {item.blockNumber}</Text>
+                                <View style={{flexDirection:"column",justifyContent:"space-evenly",height:"100%",width:"60%"}}>
                                     <Text style={style.text}>From : {item.from.slice(0,8)+'...'}</Text>
+                                    <Text style={[style.text,{textAlign:"left"}]}>To : {item.to.slice(0,8)+'...'}</Text>
                                 </View>
-                                <View style={{flexDirection:"column",justifyContent:"space-evenly"}}>
-                                    <Text style={style.text}>Votter Address : {item.hash.slice(0,8)+'...'}</Text>
-                                    <Text style={[style.text,{textAlign:"right"}]}>To : {item.to.slice(0,8)+'...'}</Text>
+                                <View style={{flexDirection:"row",justifyContent:"space-evenly",backgroundColor:'transparent',alignItems:"center",flex:1}}>
+                                    <Text style={style.text}>Sender Address</Text>
+                                    <Image
+                                        style={{width:30,height:30}}
+                                        source={require('../../assets/PNG/copy_white.png')}
+                                    />
                                 </View>
                             </View>
                        </View>
                     </View>
                     :<View style={{flexDirection:"row",justifyContent:"center",alignItems:"center",width:'100%',backgroundColor:"transparent",height:100}} onLayout={(event)=>onLayout(event)}>
-                    <View style={{width:'100%',height:"100%",justifyContent:"space-evenly",flexDirection:"column",padding:6,paddingLeft:5,backgroundColor:"#f5f5f5",borderRadius:6}}>
+                    <View style={{width:'100%',height:"100%",justifyContent:"space-evenly",flexDirection:"column",padding:6,paddingLeft:5,backgroundColor:"#202020",borderRadius:6, shadowColor: '#002147',
+          shadowOffset: { width: 0, height: 5 },
+          shadowOpacity: 0.34,
+          shadowRadius: 6.27,
+          elevation: 10,borderRadius:6}}>
                         <View style={{alignItems:"flex-start",flexDirection:"row",justifyContent:"space-between",height:"50%",backgroundColor:"transparent"}}>
-                            <View style={{flexDirection:"column",justifyContent:"space-evenly",height:"100%",width:"70%"}}>
-                                <Text style={style.text}>Hash : {item.hash.slice(0,8)+'...'}</Text>
-                                <Text style={style.text}>Time : {moment.unix(item.timeStamp).format('DD/MM/YYYY hh:mm:ss')}</Text>
+                            <View style={{flexDirection:"column",justifyContent:"space-evenly",height:"100%",width:"60%"}}>
+                                {/* <Text style={style.text}>Hash : {item.hash.slice(0,8)+'...'}</Text> */}
+                                <Text style={style.text}>Date : {moment.unix(item.timeStamp).format('DD/MM/YYYY')}</Text>
+                                <Text style={style.text}>Time : {moment.unix(item.timeStamp).format('hh:mm:ss')}</Text>
                             </View>
                             <View style={{flex:1,height:"100%",backgroundColor:"transparent",flexDirection:"row",alignItems:"center",justifyContent:"space-evenly"}}>
                                 <View style={{flexDirection:"column",justifyContent:'space-between',alignItems:"center",backgroundColor:"transparent",width:"50%"}}>
-                                    <Text style={[style.text,{textAlign:"center"}]}>{item.value?ethers.utils.formatEther(item.value):null}</Text>
+                                    <Text style={[style.text,{textAlign:"center"}]}>{item.value?Number(ethers.utils.formatEther(item.value)).toFixed(4):null}</Text>
                                     <Text style={[style.text,{textAlign:"center"}]}>ETH</Text>
                                 </View>
                                 <Image
@@ -178,13 +192,16 @@ const WalletPage = ({navigation,route}) => {
                             </View>
                         </View>
                         <View style={{flexDirection:"row",justifyContent:'space-between',backgroundColor:"transparent",flex:1}}>
-                            <View style={{flexDirection:"column",justifyContent:"space-evenly"}}>
-                                <Text style={style.text}>Block : {item.blockNumber}</Text>
-                                <Text style={style.text}>From : {item.from.slice(0,8)+'...'}</Text>
+                            <View style={{flexDirection:"column",justifyContent:"space-evenly",height:"100%",width:"60%"}}>
+                                 <Text style={style.text}>From : {item.from.slice(0,8)+'...'}</Text>
+                                    <Text style={[style.text,{textAlign:"left"}]}>To : {item.to.slice(0,8)+'...'}</Text>
                             </View>
-                            <View style={{flexDirection:"column",justifyContent:"space-evenly"}}>
-                                <Text style={style.text}>Votter Address : {item.hash.slice(0,8)+'...'}</Text>
-                                <Text style={[style.text,{textAlign:"right"}]}>To : {item.to.slice(0,8)+'...'}</Text>
+                            <View style={{flexDirection:"row",justifyContent:"space-evenly",backgroundColor:'transparent',alignItems:"center",flex:1}}>
+                            <Text style={style.text}>Receiver Address</Text>
+                                    <Image
+                                        style={{width:30,height:30}}
+                                        source={require('../../assets/PNG/copy_white.png')}
+                                    />
                             </View>
                         </View>
                    </View>
@@ -222,12 +239,12 @@ const WalletPage = ({navigation,route}) => {
           const renderLabel = ({ route, focused }) => {
             return (
                 route.title === 'Transaction'
-                ?<Text style={{opacity:focused?1:0.5,color:"#2d333a",fontSize:15}}>Transaction</Text>
+                ?<Text style={{opacity:focused?1:0.5,color:"#002147",fontSize:15}}>Transaction</Text>
                 :route.title === 'Tokens'
-                ?<Text style={{opacity:focused?1:0.5,color:"#2d333a",fontSize:15}}>Tokens</Text>
+                ?<Text style={{opacity:focused?1:0.5,color:"#002147",fontSize:15}}>Tokens</Text>
                 :route.title === 'Contracts'
-                ?<Text style={{opacity:focused?1:0.5,color:"#2d333a",fontSize:15}}>Contracts</Text>
-                :<Text style={{opacity:focused?1:0.5,color:"#2d333a",fontSize:15}}>Chart</Text>
+                ?<Text style={{opacity:focused?1:0.5,color:"#002147",fontSize:15}}>Contracts</Text>
+                :<Text style={{opacity:focused?1:0.5,color:"#002147",fontSize:15}}>Chart</Text>
             );
         };
           const renderTabBar = (props) => {
@@ -242,9 +259,9 @@ const WalletPage = ({navigation,route}) => {
                         // }}
                         style={{elevation: 0,
                             shadowOpacity: 0,
-                            height: 48,backgroundColor:"orange"}}
+                            height: 48,backgroundColor:"orange",width:"100%"}}
                         renderLabel={renderLabel}
-                        indicatorStyle={{ backgroundColor: '#fff' }}
+                        indicatorStyle={{ backgroundColor: '#002147' }}
                         scrollEnabled={true}
                     />
                     </>
@@ -252,30 +269,30 @@ const WalletPage = ({navigation,route}) => {
         };
   return (
       <>
-    <View style={{flex:1,backgroundColor:"#14213D",padding:15}}>
+    <View style={{height:"30%",width:"100%",backgroundColor:"#fff",padding:15,flexDirection:'column',justifyContent:"flex-start"}}>
         {sideview==true?
-        <Animated.View style={{transform: [{ translateX: pan.x }, { translateY: pan.y }],flexDirection:"row",justifyContent:"space-between",width:"100%",height:"30%"}} {...panResponder.panHandlers} >
-            <View style={{width:"70%",height:"100%",backgroundColor:"lightblue",flexDirection:'row',justifyContent:'flex-start',alignItems:"center",borderTopLeftRadius:10,borderBottomLeftRadius:10}}>
+        <Animated.View style={{transform: [{ translateX: pan.x }, { translateY: pan.y }],flexDirection:"row",justifyContent:"space-between",flex:1}} {...panResponder.panHandlers} >
+            <View style={{width:"70%",height:"100%",backgroundColor:"#002147",flexDirection:'row',justifyContent:'flex-start',alignItems:"center",borderTopLeftRadius:10,borderBottomLeftRadius:10}}>
                 <View style={{width:'30%',height:"100%",backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"flex-end"}}>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>Name</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>Address</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>Balance</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>Dollar</Text>
+                    <Text style={{fontSize:15,fontWeight:'bold',color:'orange'}}>Name</Text>
+                    <Text style={{fontSize:15,fontWeight:'bold',color:'orange'}}>Address</Text>
+                    <Text style={{fontSize:15,fontWeight:'bold',color:'orange'}}>Balance</Text>
+                    <Text style={{fontSize:15,fontWeight:'bold',color:'orange'}}>Dollar</Text>
                 </View>
                 <View style={{width:"5%",height:"100%",backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"center"}}>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>:</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>:</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>:</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>:</Text>
+                    <Text style={{fontSize:15,fontWeight:'bold',color:'orange'}}>:</Text>
+                    <Text style={{fontSize:15,fontWeight:'bold',color:'orange'}}>:</Text>
+                    <Text style={{fontSize:15,fontWeight:'bold',color:'orange'}}>:</Text>
+                    <Text style={{fontSize:15,fontWeight:'bold',color:'orange'}}>:</Text>
                 </View>
                 <View style={{height:"100%",flex:1,backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"flex-start"}}>
-                    <Text style={{fontSize:15,fontWeight:'bold',}}>{name}</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>{address.slice(0, 5)+'...'+address.slice(
+                    <Text style={{fontSize:15,fontWeight:'bold',alignItems:"center",color:'#fff'}}>{name}</Text>
+                    <Text style={{fontSize:15,fontWeight:'bold',color:'#fff'}}>{address.slice(0, 5)+'...'+address.slice(
                                 address.length - 4,
                                 address.length,
                                 )}</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>{balances?ethers.utils.formatEther(balances):null} ETH</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>${balances?(USD*(ethers.utils.formatEther(balances))).toFixed(2):null}</Text>
+                    <Text style={{fontSize:15,fontWeight:'bold',color:'#fff'}}>{balances?Number(ethers.utils.formatEther(balances)).toFixed(4):null} ETH</Text>
+                    <Text style={{fontSize:15,fontWeight:'bold',color:'#fff'}}>${balances?(USD*(ethers.utils.formatEther(balances))).toFixed(2):null}</Text>
                 </View>
             </View>
             <View style={{flexDirection:"column",justifyContent:'space-evenly',flex:1,alignItems:'center',backgroundColor:"lightblue",borderTopRightRadius:10,borderBottomRightRadius:10}}>
@@ -300,7 +317,6 @@ const WalletPage = ({navigation,route}) => {
             </View>
         </Animated.View>
         :
-        
         <View style={{flexDirection:"row",justifyContent:"space-between",width:"100%",height:"30%",marginTop:5}}>
         <View style={{flexDirection:"column",justifyContent:'space-evenly',flex:1,alignItems:'center',backgroundColor:"lightblue",borderTopLeftRadius:10,borderBottomLeftRadius:10}}>
                     <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}}>
@@ -347,6 +363,7 @@ const WalletPage = ({navigation,route}) => {
             </View>
             
         </View>}
+    </View>
         <TabView
       navigationState={{ index, routes }}
       renderScene={renderScene}
@@ -357,7 +374,6 @@ const WalletPage = ({navigation,route}) => {
       renderTabBar={renderTabBar}
 
     />
-    </View>
    
     <Modal
         isVisible={count}
@@ -395,7 +411,7 @@ const WalletPage = ({navigation,route}) => {
 export default WalletPage;
 const style = StyleSheet.create({
     text:{
-        color:"#2d333a",
+        color:"#fff",
         flexWrap:'wrap',
         fontSize:12
     },
@@ -443,7 +459,7 @@ const style = StyleSheet.create({
         alignSelf: 'center'
     },
     containers: {
-        marginTop: 10,
+        marginTop: 0,
       },
       scene: {
         flex: 1,

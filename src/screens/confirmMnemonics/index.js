@@ -35,6 +35,7 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
     console.log(mnemonics);
     // console.log(ethers.utils.isValidMnemonic(mnemonics));
     let wallet1 =  ethers.Wallet.fromMnemonic(mnemonics);
+    console.log('wallet1',wallet1);
     wallet1 = wallet1.connect(PROVIDER);
     // console.log(wallet1)
     return wallet1;

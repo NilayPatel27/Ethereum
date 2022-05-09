@@ -22,13 +22,12 @@ const CofirmTransaction = ({navigation,route}) => {
          });
          for(let i=0;i<addres.length;i++){
             if(address==addres[i].address){
-                setWallet(addres[i].wallet);
+                setWallet(addres[i].privateKey);
             }
         }
     }, [])
     
 const DEFAULT_GASLIMIT = 21000;
-// const DEFAULT_GASLIMIT = 200000;
 const DEFAULT_GASPRICE = 4000000000;
 
     const transObj =(to,value,gasLimit = DEFAULT_GASLIMIT,options = {})=>{
@@ -42,10 +41,10 @@ const DEFAULT_GASPRICE = 4000000000;
             value,
             ...options
     }}
-const finaltransaction = async (hash) => {
+const finaltransaction = async (hash,wall) => {
     console.log('hash',hash);
     try{
-        let res = await wallet.provider.waitForTransaction(hash,1);
+        let res = await wall.provider.waitForTransaction(hash,1);
         console.log('res',res);
         console.log('Transaction mined!');
     }
@@ -66,17 +65,17 @@ const finaltransaction = async (hash) => {
         // console.log(objOfTransaction);
         // console.log(wallet);
         // console.log(wallet.privateKey);
-        let txn = await wallet.sendTransaction(objOfTransaction);
+    const PROVIDER = new ethers.getDefaultProvider('ropsten');
+        const wall = new ethers.Wallet(wallet,PROVIDER);
+        let txn = await wall.sendTransaction(objOfTransaction);
         // const createReceipt = await wallet.sendTransaction(txn);
         // console.log(createReceipt.hash);
         // console.log(createReceipt);
-      const final = await finaltransaction(txn.hash);
-      console.log(final);
+      const final = await finaltransaction(txn.hash,wall);
     }
   return (
       <>
     <View style={{backgroundColor:"#14213D",flex:1,flexDirection:"column",justifyContent:"flex-start"}}>
-
     <View>
         <View style={{height,backgroundColor:"transparent",flexDirection:"row",justifyContent:"center",marginTop:10,padding:10}}>
             <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"center",flex:1}}>
