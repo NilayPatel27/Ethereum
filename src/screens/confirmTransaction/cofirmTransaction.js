@@ -43,7 +43,9 @@ const DEFAULT_GASPRICE = 4000000000;
     }}
 const finaltransaction = async (hash,wall) => {
     console.log('hash',hash);
+    console.log(wall instanceof ethers.Wallet);
     try{
+        console.log('try');
         let res = await wall.provider.waitForTransaction(hash,1);
         console.log('res',res);
         console.log('Transaction mined!');
@@ -65,13 +67,16 @@ const finaltransaction = async (hash,wall) => {
         // console.log(objOfTransaction);
         // console.log(wallet);
         // console.log(wallet.privateKey);
-    const PROVIDER = new ethers.getDefaultProvider('ropsten');
+    const PROVIDER = new ethers.providers.getDefaultProvider('ropsten');
         const wall = new ethers.Wallet(wallet,PROVIDER);
         let txn = await wall.sendTransaction(objOfTransaction);
+        console.log('txn',txn);
+        console.log('wall',wall)
         // const createReceipt = await wallet.sendTransaction(txn);
         // console.log(createReceipt.hash);
         // console.log(createReceipt);
       const final = await finaltransaction(txn.hash,wall);
+      console.log('final',final);
     }
   return (
       <>

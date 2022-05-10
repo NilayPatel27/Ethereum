@@ -1,4 +1,4 @@
-import React,{useRef,useState} from 'react';
+import React,{useEffect, useRef,useState} from 'react';
 import {View, Text, Image, TouchableOpacity, TextInput, Button, Switch, ToastAndroid} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -18,6 +18,7 @@ import BuyEther from '../src/screens/buyEther';
 import SendEther from '../src/screens/send/index';
 import AmountPage from '../src/screens/confirmTransaction/amountPage';
 import CofirmTransaction from '../src/screens/confirmTransaction/cofirmTransaction';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Stack = createNativeStackNavigator();
 
 const screenOptions = {
@@ -29,9 +30,17 @@ const dispatch = useDispatch();
 var address = useSelector(selectAddress);
 console.log('address',address);
 
-setTimeout(() => {
-  console.log('address',address);
-}, 1000);
+// setTimeout(() => {
+//   console.log('address',address);
+// }, 1000);
+useEffect(() => {
+//  AsyncStorage.getItem('address').then(value => {
+//   console.log('value',value);
+//  }  ).catch(err => {
+//   console.log('err',err);
+//   });
+}, [])
+
   const toggleSwitch = () =>{
     setIsEnabled(previousState => !previousState);
     {isEnabled ?
@@ -66,7 +75,7 @@ setTimeout(() => {
             </>
           )} 
           )} component={HomePage} />
-        <Stack.Screen name="Ethereum" component={Ethereum} />
+        <Stack.Screen name="Accounts" component={Ethereum} />
           <Stack.Screen name="ImportAccount" component={ImportAccount} />
           <Stack.Screen name="WalletPage" component={WalletPage} />
       </Stack.Navigator>

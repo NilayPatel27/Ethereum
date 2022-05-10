@@ -58,7 +58,7 @@ const SendEther = ({navigation,route}) => {
                     <Text style={{color:"#fff",fontSize:20,fontWeight:"bold",textAlign:"center"}}>To</Text>
                     <View style={{flexDirection:"row",justifyContent:"space-evenly",alignItems:'center',width:"80%",backgroundColor:"#fff",borderRadius:10}}>
                         <TextInput
-                            style={{backgroundColor:"#fff",justifyContent:"space-evenly",flexDirection:"column",width:"80%",borderWidth:1,borderColor:'#fff',borderRadius:10,padding:10,height:50}} 
+                            style={{backgroundColor:"#fff",justifyContent:"space-evenly",flexDirection:"column",width:"80%",borderWidth:1,borderColor:'#fff',borderRadius:10,padding:10,height:50,color:"#2d333a"}} 
                             placeholder="Enter Address"
                             placeholderTextColor="#2d333a"
                             ref={addres}

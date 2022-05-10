@@ -12,6 +12,7 @@
   "dependencies": {
     "@ethersproject/hdnode": "^5.6.0",
     "@ethersproject/shims": "^5.6.0",
+    "@motify/components": "^0.17.1",
     "@react-native-async-storage/async-storage": "^1.17.3",
     "@react-native-community/clipboard": "^1.5.1",
     "@react-native-firebase/app": "^14.9.1",
@@ -23,6 +24,7 @@
     "ethers": "^5.6.4",
     "lodash": "^4.17.21",
     "moment": "^2.29.3",
+    "moti": "^0.17.1",
     "number-to-words": "^1.2.4",
     "randombytes": "^2.1.0",
     "react": "17.0.2",

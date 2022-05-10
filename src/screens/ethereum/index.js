@@ -17,17 +17,11 @@ let width = Dimensions.get('window').width.toFixed() * 0.8;
 width = width.toFixed();
 console.log(width);
 
-const Ethereum = ({navigation, route}) => {
-  const {wallet,balances} = route.params;
-  const [balance, setbalances] = useState(null);
-  const [resBal, setresBal] = useState([]);
-  const [resobj, setresobj] = useState([]);
-  const [res, setres] = useState(false);
+const Ethereum = ({navigation}) => {
   const [count, setcount] = useState(false);
   const [privateKey, setprivateKey] = useState('');
   const textValue = useRef();
 
-    let resObj=[]
     var address = useSelector(selectAddress);
     const dispatch = useDispatch();
 
@@ -35,45 +29,18 @@ const Ethereum = ({navigation, route}) => {
         console.log(address.length)
     }, [])
 
-    const bal = async () => {
-      const provider = ethers.getDefaultProvider('ropsten');
-      // var balance = await provider.getBalance(route.params.wallet.address);
-      // setbalances(Number(balance));
-      return balance;
-    };
-
   const refRBSheet = useRef();
   const addressRef = useRef();
-
-  // console.log(wallet);
   const USD =Number('2824.96');
-
   const array = address;
-  // console.log(array);
 
   const copyToClipboard =(index)=>{
-    // console.log('index',array[index]);
     let c =converter.toWordsOrdinal(index);
     console.log(c);
     ToastAndroid.show('Address Copied to clipboard', ToastAndroid.SHORT);
      return Clipboard.setString(array[index].address);
   }
 
-  const balOfWallets = ()=>{
-    console.log(address)
-    let a=[];
-    for(let i = 0; i < address.length; i++){
-     a.push(address[i].address);
-    }
-    let j = a.join()
-    console.log(typeof j);
-    axios.get(`https://api-ropsten.etherscan.io/api?module=account&action=balancemulti&address=${j}&apikey=349IQMJ71CEBWJ65I1U5G5N5NG43C37UZB&tag=latest`).then(res => { 
-      // console.log(res.data.result);
-      resObj = res.data.result;
-      console.log('resObj',resObj[0].balance);
-    });
-    setresobj(resObj);
-  }
 const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
 
   const createWallet = () =>{
@@ -95,13 +62,11 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
         return;
       }
     }
-    // setcount(!count);
     dispatch(addressArray(obj));
-    // console.log(count);
   }
   const importWallet = () =>{
     console.log(privateKey);
-    const PROVIDER = new ethers.getDefaultProvider('ropsten');
+    const PROVIDER = new ethers.providers.getDefaultProvider('ropsten');
     try{
       let wallet = new ethers.Wallet(privateKey,PROVIDER);
       wallet= wallet.connect(PROVIDER);
@@ -126,10 +91,10 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
   }
   return (
       <>
-      <View style={{height:'100%',width:"100%",flexDirection:"column",backgroundColor: '#14213D'}}>
+      <View style={{height:'100%',width:"100%",flexDirection:"column",backgroundColor: '#fff'}}>
         <View style={{flexDirection:'row',height:'10%',justifyContent:"space-between",width:"95%",alignSelf:"center",backgroundColor:'transparent',alignItems:"center"}}>
             <View style={{backgroundColor:"transparent",flexDirection:"row",flex:1,alignItems:'center'}}>
-              <Text style={{color:"#fff",fontSize:20}}>Ethereum Accounts</Text>
+              <Text style={{color:"#2d333a",fontSize:20,fontWeight:'bold'}}>Ethereum Accounts</Text>
               <Image
               style={{width: 30, height: 30, }}
               source={require('../../assets/PNG/Ethereum.png')}
@@ -154,11 +119,10 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
           <>
           <TouchableOpacity onPress={()=>navigation.navigate('WalletPage',{address:item.address,name:item.name})}>
           <View style={{flex:1,alignSelf:'center',flexDirection:'row'}} ref={addressRef} key={index}>
-            <View style={{width:"95%",flexDirection:"row",justifyContent:"space-between",alignItems:'center',padding:10,backgroundColor: '#fff',}}>
+            <View style={{width:"95%",flexDirection:"row",justifyContent:"space-between",alignItems:'center',padding:10,backgroundColor: '#002147'}}>
             <View style={{justifyContent: 'flex-start',flexDirection:'column'}}>
-                <Text style={{color:"#000",fontWeight:'bold'}}>Name : {item.name}</Text>
-                {/* <Text style={{color:"#000",fontWeight:'bold'}}>{updateBalance(item.address)}</Text> */}
-                <Text style={{color:"#000"}}>
+                <Text style={{color:"#fff",fontWeight:'bold'}}>Name : {item.name}</Text>
+                <Text style={{color:"#fff"}}>
                   Address : {item.address.slice(0, 5) +
                         '...' +
                         item.address.slice(
@@ -166,18 +130,13 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
                         item.address.length,
                         )}
                     </Text>
-                    {/* <Text style={{color:"#2d333a"}}>Balance : {ethers.utils.formatEther(Number(resObj[].balance))} ETH
-                    </Text> */}
-                    {/* <Text style={{color:"#2d333a"}}>
-                        ={(USD*item.balance).toFixed(2)}$ USD
-                    </Text> */}
             </View>
                 <TouchableOpacity onPress={()=>{
                   // setIndex(index);
                   copyToClipboard(index);}}>
                 <Image
                     style={{width: 25, height: 25}}
-                    source={require('../../assets/PNG/copy.png')}/>
+                    source={require('../../assets/PNG/copy_white.png')}/>
                     </TouchableOpacity>
                     </View>
           </View>
@@ -185,7 +144,7 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
           </>
         )}
         keyExtractor={(item, index) => index.toString()}
-        ItemSeparatorComponent={() => <View style={{height:20,backgroundColor:'#14213D'}}></View>}
+        ItemSeparatorComponent={() => <View style={{height:20,backgroundColor:'#fff'}}></View>}
         />
         </View>
         <Modal

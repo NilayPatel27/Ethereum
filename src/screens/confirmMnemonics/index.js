@@ -3,12 +3,19 @@ import React, {useRef} from 'react';
 import _ from 'lodash';
 import { ethers } from 'ethers';
 import ConfirmBox from './ConfirmBox';
+import { useDispatch, useSelector } from 'react-redux';
+import converter from 'number-to-words';
+import { addressArray, selectAddress } from '../../../counterSlice';
 
 const windowWidth = Dimensions.get('window').width;
 
 const ConfirmMnemonics = ({navigation, route}) => {
   const {mnemonic} = route.params;
   const Confirm = useRef();
+  const dispatch = useDispatch();
+  var address = useSelector(selectAddress);
+
+
   const onPressConfirm = () => {
     // if (!Confirm.current.isValidSequence()) {
     //   Alert.alert('Invalid sequence', 'Please select the correct sequence');
@@ -16,7 +23,20 @@ const ConfirmMnemonics = ({navigation, route}) => {
     // }
     const wallet = loadWalletFromMnemonics(mnemonic);
     console.log(wallet.privateKey);
-    navigation.navigate('HomePage',{wallet});
+    let obj = {
+      name: converter.toWordsOrdinal(address.length),
+      address:wallet.address,
+      wallet:wallet,
+      privateKey:wallet.privateKey,
+    }
+    for(let i = 0; i < address.length; i++){
+      if(address[i].address === wallet.address){
+        return;
+      }
+    }
+    dispatch(addressArray(obj));
+    navigation.navigate('HomePage');
+    // navigation.navigate('HomePage',{wallet});
     console.log('Confirm');
   };
 const PROVIDER = ethers.providers.getDefaultProvider('ropsten');

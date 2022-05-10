@@ -8,7 +8,9 @@ import {selectView} from '../../../counterSlice';
 import React,{useState,useEffect,useRef} from 'react'
 import Clipboard from '@react-native-community/clipboard';
 import { TabView, SceneMap,TabBar} from 'react-native-tab-view';
+// import { MotiView } from '@motify/components';
 import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet, ToastAndroid, Share ,TouchableWithoutFeedback,ActivityIndicator,Animated,PanResponder,Dimensions,StatusBar} from 'react-native'
+import { color } from 'react-native-elements/dist/helpers';
 
 const WalletPage = ({navigation,route}) => {
     const pan = useRef(new Animated.ValueXY()).current;
@@ -53,8 +55,8 @@ const WalletPage = ({navigation,route}) => {
   const [routes] = React.useState([
     { key: 'first', title: 'Transaction' },
     { key: 'second', title: 'Tokens' },
-    { key: 'third', title: 'Contracts' },
-    { key: 'fourth', title: 'Chart' },
+    // { key: 'third', title: 'Contracts' },
+    { key: 'third', title: 'Chart' },
 
   ]);
     const {address,name} = route.params;
@@ -64,7 +66,7 @@ const WalletPage = ({navigation,route}) => {
     const [balances, setbalances] = useState(null);
     const [transaction, settransaction] = useState([]);
     const [res, setres] = useState(false);
-    console.log(address,name)
+    // console.log(address,name)
     useEffect(() => {
         console.log('sideview',sideview)
         axios.get(`https://api-ropsten.etherscan.io/api?module=account&action=balance&address=${address}&apikey=349IQMJ71CEBWJ65I1U5G5N5NG43C37UZB&tag=latest`).then(res => { 
@@ -100,50 +102,119 @@ const WalletPage = ({navigation,route}) => {
                     source={require('../../assets/PNG/Send.png')}
                     style={{height:25,width:25}}
                 />}
-                    <Text >{label}</Text>
+                    <Text style={{color:"#2d333a"}}>{label}</Text>
                 </View>
             </TouchableWithoutFeedback>
         );
         const onLayout=(event)=> {
             const {x, y, height, width} = event.nativeEvent.layout;
-            console.log(x, y, height, width);
+            // console.log(x, y, height, width);
           }
-          const FirstRoute = () => (
+        //   const LoadingIndicator = ({size}) => {
+        //       return(
+        //          <MotiView
+        //          from ={{
+        //             width:size,
+        //             height:size,
+        //             borderRadius:size/2,
+        //             borderWidth:0,
+        //             shadowOpacity:0.5
+        //          }}
+        //          animate={{
+        //             width:size+20,
+        //             height:size+20,
+        //             borderRadius:(size +20)/2,
+        //             borderWidth:size/10,
+        //             shadowOpacity:1
+        //          }}
+        //          transition={{
+        //              type:'timing',
+        //              duration:1000,
+        //              loop:true
+        //          }}
+        //          style={{
+        //              width:size,
+        //                 height:size,
+        //                 borderRadius:size/2,
+        //                 borderWidth:size/2,
+        //                 borderColor:'#fff',
+        //                 shadowOffset:{width:0,height:0},
+        //                 shadowOpacity:1,
+        //                 shadowRadius:10,
+        //          }}
+        //          />
+        //       )
+        //   }
+          const FirstRoute = () => {
+              const scrollY = React.useRef(new Animated.Value(0)).current;
+              return(
             <>
-            <View style={{flex:1,justifyContent:"flex-start",flexDirection:'column',backgroundColor:"#fff",padding:10,}}>
-            {/* <View style={{height:50,flexDirection:"row",justifyContent:"space-between",backgroundColor:"red"}}>
-                <View style={{height:'100%',width:"50%",backgroundColor:"orange",justifyContent:"center",alignItems:"center"}}>
-                    <Text style={{fontSize:20,fontWeight:'bold',color:"#fff"}}>Transactions</Text>
-                </View>
-            <View style={{height:'100%',width:"50%",backgroundColor:"orange",justifyContent:"center",alignItems:"center"}}>
-                <Text style={{fontSize:20,fontWeight:'bold',color:"#fff"}}>Transactions</Text>
-            </View>
-            </View> */}
-        {res==false?<ActivityIndicator  size="small" color="#0000ff" style={{flex:1,justifyContent:"center",alignItems:"center",flexDirection:"row"}}/>:
+            <View style={{flex:1,justifyContent:"flex-start",flexDirection:'column',backgroundColor:"#fff",padding:10}}>
+        {res==false
+        ?
+        // <LoadingIndicator size={100}/>
+        <ActivityIndicator  size="small" color="#0000ff" style={{flex:1,justifyContent:"center",alignItems:"center",flexDirection:"row"}}/>
+        :
         <>
             {transaction.length==0?<View style={{backgroundColor:"transparent",flex:1,justifyContent:"center",alignItems:"center"}}>
-                <Text style={{fontSize:20,fontWeight:'bold',color:"#fff"}}>No Transaction</Text>
+                <Text style={{fontSize:20,fontWeight:'bold',color:"#2d333a"}}>No Transaction</Text>
             </View>:
-            <FlatList
+            <>
+            <Image
+            source={require('../../assets/PNG/Ethereum.png')}
+            style={{height:"100%",width:"100%",position:"absolute",justifyContent:'center',alignItems:"center"}}
+            blurRadius={5}
+            resizeMode="stretch"
+        />
+            <Animated.FlatList
                 data={transaction}
-                renderItem={({item,index}) => (
+                // onScroll={Animated.event(
+                //     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                //     { useNativeDriver: true }
+                // )}
+                // onScrollEndDrag={() => {
+                //     console.log('onScrollEndDrag');
+                // }}
+                renderItem={ ({item,index}) => {
+                    const itemSize =100 +10;
+                    const inputRange = [
+                        -1,
+                        0,
+                        itemSize *index,
+                        itemSize *(index+2),
+                    ];
+                    const opacityInputRange = [
+                        -1,
+                        0,
+                        itemSize *index,
+                        itemSize *(index+0.5),
+                    ];
+                    const scale = scrollY.interpolate({
+                        inputRange:opacityInputRange,
+                        outputRange: [1, 1, 1, 0],
+                    });
+                    const opacity = scrollY.interpolate({
+                        inputRange,
+                        outputRange: [1, 1, 1, 0],
+                    });
+                   return (
                     <>
-                    {console.log(item.to,address)}
+                    {/* {console.log(item.to,address)} */}
                     {item.to== address.toLowerCase()
-                    ?<View style={{flexDirection:"row",justifyContent:"center",alignItems:"center",width:'100%',backgroundColor:"transparent",height:100,}} onLayout={(event)=>onLayout(event)}>
-                        <View style={{width:'100%',height:"100%",justifyContent:"space-evenly",flexDirection:"column",padding:6,paddingLeft:5,backgroundColor:"#202020",borderRadius:6, shadowColor: '#002147',
-          shadowOffset: { width: 0, height: 5 },
-          shadowOpacity: 0.34,
-          shadowRadius: 6.27,
-          elevation: 10,}}>
-                            <View style={{alignItems:"flex-start",flexDirection:"row",justifyContent:"space-between",height:"50%",backgroundColor:"transparent"}}>
-                                <View style={{flexDirection:"column",justifyContent:"space-evenly",height:"100%",width:"60%"}}>
-                                    {/* <Text style={style.text}>Hash : {item.hash.slice(0,8)+'...'}</Text> */}
+                    ?<Animated.View style={[style.firstView
+                        ,
+                        // { opacity,
+                        // transform:[{scale}]
+                        // }
+                        ]} onLayout={(event)=>onLayout(event)}>
+                        <View style={style.secondView}>
+                            <View style={style.thirdView}>
+                                <View style={style.fourthView}>
                                     <Text style={style.text}>Date : {moment.unix(item.timeStamp).format('DD/MM/YYYY')}</Text>
                                     <Text style={style.text}>Time : {moment.unix(item.timeStamp).format('hh:mm:ss')}</Text>
                                 </View>
-                                <View style={{flex:1,height:"100%",backgroundColor:"transparent",flexDirection:"row",alignItems:"center",justifyContent:"space-evenly"}}>
-                                    <View style={{flexDirection:"column",justifyContent:'space-between',alignItems:"center",backgroundColor:"transparent",width:"50%"}}>
+                                <View style={style.fifthView}>
+                                    <View style={style.seventhView}>
                                         <Text style={[style.text,{textAlign:"center"}]}>{item.value?Number(ethers.utils.formatEther(item.value)).toFixed(4):null}</Text>
                                         <Text style={[style.text,{textAlign:"center"}]}>ETH</Text>
                                     </View>
@@ -154,11 +225,11 @@ const WalletPage = ({navigation,route}) => {
                                 </View>
                             </View>
                             <View style={{flexDirection:"row",justifyContent:'space-between',backgroundColor:"transparent",flex:1}}>
-                                <View style={{flexDirection:"column",justifyContent:"space-evenly",height:"100%",width:"60%"}}>
+                                <View style={style.fourthView}>
                                     <Text style={style.text}>From : {item.from.slice(0,8)+'...'}</Text>
-                                    <Text style={[style.text,{textAlign:"left"}]}>To : {item.to.slice(0,8)+'...'}</Text>
+                                    <Text style={style.textLeft}>To : {item.to.slice(0,8)+'...'}</Text>
                                 </View>
-                                <View style={{flexDirection:"row",justifyContent:"space-evenly",backgroundColor:'transparent',alignItems:"center",flex:1}}>
+                                <View style={style.eightView}>
                                     <Text style={style.text}>Sender Address</Text>
                                     <Image
                                         style={{width:30,height:30}}
@@ -167,103 +238,117 @@ const WalletPage = ({navigation,route}) => {
                                 </View>
                             </View>
                        </View>
-                    </View>
-                    :<View style={{flexDirection:"row",justifyContent:"center",alignItems:"center",width:'100%',backgroundColor:"transparent",height:100}} onLayout={(event)=>onLayout(event)}>
-                    <View style={{width:'100%',height:"100%",justifyContent:"space-evenly",flexDirection:"column",padding:6,paddingLeft:5,backgroundColor:"#202020",borderRadius:6, shadowColor: '#002147',
-          shadowOffset: { width: 0, height: 5 },
-          shadowOpacity: 0.34,
-          shadowRadius: 6.27,
-          elevation: 10,borderRadius:6}}>
-                        <View style={{alignItems:"flex-start",flexDirection:"row",justifyContent:"space-between",height:"50%",backgroundColor:"transparent"}}>
-                            <View style={{flexDirection:"column",justifyContent:"space-evenly",height:"100%",width:"60%"}}>
-                                {/* <Text style={style.text}>Hash : {item.hash.slice(0,8)+'...'}</Text> */}
-                                <Text style={style.text}>Date : {moment.unix(item.timeStamp).format('DD/MM/YYYY')}</Text>
-                                <Text style={style.text}>Time : {moment.unix(item.timeStamp).format('hh:mm:ss')}</Text>
-                            </View>
-                            <View style={{flex:1,height:"100%",backgroundColor:"transparent",flexDirection:"row",alignItems:"center",justifyContent:"space-evenly"}}>
-                                <View style={{flexDirection:"column",justifyContent:'space-between',alignItems:"center",backgroundColor:"transparent",width:"50%"}}>
-                                    <Text style={[style.text,{textAlign:"center"}]}>{item.value?Number(ethers.utils.formatEther(item.value)).toFixed(4):null}</Text>
-                                    <Text style={[style.text,{textAlign:"center"}]}>ETH</Text>
+                    </Animated.View>
+                    :<Animated.View style={[style.firstView,{ opacity,
+                        transform:[{scale}]}]} onLayout={(event)=>onLayout(event)}>
+                        <View style={style.secondView}>
+                            <View style={style.thirdView}>
+                                <View style={style.fourthView}>
+                                    {/* <Text style={style.text}>Hash : {item.hash.slice(0,8)+'...'}</Text> */}
+                                    <Text style={style.text}>Date : {moment.unix(item.timeStamp).format('DD/MM/YYYY')}</Text>
+                                    <Text style={style.text}>Time : {moment.unix(item.timeStamp).format('hh:mm:ss')}</Text>
                                 </View>
-                                <Image
-                                    style={{width:30,height:30}}
-                                    source={require('../../assets/PNG/up.png')}
-                                />
-                            </View>
-                        </View>
-                        <View style={{flexDirection:"row",justifyContent:'space-between',backgroundColor:"transparent",flex:1}}>
-                            <View style={{flexDirection:"column",justifyContent:"space-evenly",height:"100%",width:"60%"}}>
-                                 <Text style={style.text}>From : {item.from.slice(0,8)+'...'}</Text>
-                                    <Text style={[style.text,{textAlign:"left"}]}>To : {item.to.slice(0,8)+'...'}</Text>
-                            </View>
-                            <View style={{flexDirection:"row",justifyContent:"space-evenly",backgroundColor:'transparent',alignItems:"center",flex:1}}>
-                            <Text style={style.text}>Receiver Address</Text>
+                                <View style={style.fifthView}>
+                                    <View style={style.seventhView}>
+                                        <Text style={[style.text,{textAlign:"center"}]}>{item.value?Number(ethers.utils.formatEther(item.value)).toFixed(4):null}</Text>
+                                        <Text style={[style.text,{textAlign:"center"}]}>ETH</Text>
+                                    </View>
                                     <Image
                                         style={{width:30,height:30}}
-                                        source={require('../../assets/PNG/copy_white.png')}
+                                        source={require('../../assets/PNG/up.png')}
                                     />
+                                </View>
+                            </View>
+                            <View style={{flexDirection:"row",justifyContent:'space-between',backgroundColor:"transparent",flex:1}}>
+                                <View style={style.fourthView}>
+                                    <Text style={style.text}>From : {item.from.slice(0,8)+'...'}</Text>
+                                        <Text style={style.textLeft}>To : {item.to.slice(0,8)+'...'}</Text>
+                                </View>
+                                <View style={style.eightView}>
+                                <Text style={style.text}>Receiver Address</Text>
+                                        <Image
+                                            style={{width:30,height:30}}
+                                            source={require('../../assets/PNG/copy_white.png')}
+                                        />
+                                </View>
                             </View>
                         </View>
-                   </View>
-                </View>
+                </Animated.View>
                     }
                     </>
-                )}
-                ListHeaderComponent={()=>(
-                    <View style={{height:10,backgroundColor:"transparent"}}/>
-                )}
+                )}}
+                // ListHeaderComponent={()=>(
+                //     <View style={{height:10,backgroundColor:"transparent"}}/>
+                // )}
                 keyExtractor={item => item.hash}
                 showsVerticalScrollIndicator={false}
                 ItemSeparatorComponent={() => <View style={{height:10,backgroundColor:"transparent"}}/>}
             />
+            </>
             }
             </>}
-        </View>
-            </>
-          );
+             </View>
+            </>)
+            }
+          
           const SecondRoute = () => (
-            <View style={[style.scene, { backgroundColor: '#673ab7' }]} />
+            <View style={{backgroundColor:"transparent",flex:1,justifyContent:"center",alignItems:"center"}}>
+            <Text style={{fontSize:20,fontWeight:'bold',color:"#2d333a"}}>No Tokens</Text>
+        </View>
             );
           const ThirdRoute = () => (
-            <View style={[style.scene, { backgroundColor: 'red' }]} />
+            <View style={{backgroundColor:"transparent",flex:1,justifyContent:"center",alignItems:"center"}}>
+            <Text style={{fontSize:20,fontWeight:'bold',color:"#2d333a"}}>No Chart</Text>
+        </View>
             );
-          const FourthRoute = () => (
-            <View style={[style.scene, { backgroundColor: 'blue' }]} />
-            );
+          
           const renderScene = SceneMap({
             first: FirstRoute,
             second: SecondRoute,
             third: ThirdRoute,
-            fourth: FourthRoute,
           });
           const renderLabel = ({ route, focused }) => {
             return (
                 route.title === 'Transaction'
-                ?<Text style={{opacity:focused?1:0.5,color:"#002147",fontSize:15}}>Transaction</Text>
+                ?<Image
+                style={{width: 20, height: 20,opacity:focused?1:0.5}}
+                source={require('../../assets/PNG/up_down.png')}/> 
                 :route.title === 'Tokens'
-                ?<Text style={{opacity:focused?1:0.5,color:"#002147",fontSize:15}}>Tokens</Text>
-                :route.title === 'Contracts'
-                ?<Text style={{opacity:focused?1:0.5,color:"#002147",fontSize:15}}>Contracts</Text>
-                :<Text style={{opacity:focused?1:0.5,color:"#002147",fontSize:15}}>Chart</Text>
+                ?<Image
+                style={{width: 20, height: 20,opacity:focused?1:0.5}}
+                source={require('../../assets/PNG/Ethereum.png')}/>
+                :<Image
+                style={{width: 20, height: 20,opacity:focused?1:0.5}}
+                source={require('../../assets/PNG/chart.png')}/>
             );
         };
           const renderTabBar = (props) => {
             return (
                 <>
+                <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"center"}}>
+                <Text style={{paddingLeft:10,fontWeight:"bold",fontSize:20,color:"#2d333a"}}>{routes[index].title}</Text>
                     <TabBar
                         {...props}
                         // onTabPress={({ route, preventDefault }) => {
-                        //     if (isListGliding.current) {
+                        //     // if (isListGliding.current) {
                         //         preventDefault();
-                        //     }
+                        //     // }
                         // }}
-                        style={{elevation: 0,
-                            shadowOpacity: 0,
-                            height: 48,backgroundColor:"orange",width:"100%"}}
+                        pressColor="#fff"
+                        style={style.tabBar}
                         renderLabel={renderLabel}
-                        indicatorStyle={{ backgroundColor: '#002147' }}
+                        tabStyle={{
+                            backgroundColor:"#fff",
+                            // flex:0.5,
+                            width:40
+                        }}
+                        // bounces={true}
+                        // layout={'iconOnly'}
+                        indicatorStyle={{ backgroundColor: 'transparent' }}
                         scrollEnabled={true}
-                    />
+                        // renderIndicator={() => null}
+                        />
+                        </View>
                     </>
             );
         };
@@ -274,16 +359,16 @@ const WalletPage = ({navigation,route}) => {
         <Animated.View style={{transform: [{ translateX: pan.x }, { translateY: pan.y }],flexDirection:"row",justifyContent:"space-between",flex:1}} {...panResponder.panHandlers} >
             <View style={{width:"70%",height:"100%",backgroundColor:"#002147",flexDirection:'row',justifyContent:'flex-start',alignItems:"center",borderTopLeftRadius:10,borderBottomLeftRadius:10}}>
                 <View style={{width:'30%',height:"100%",backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"flex-end"}}>
-                    <Text style={{fontSize:15,fontWeight:'bold',color:'orange'}}>Name</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold',color:'orange'}}>Address</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold',color:'orange'}}>Balance</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold',color:'orange'}}>Dollar</Text>
+                    <Text style={style.orange}>Name</Text>
+                    <Text style={style.orange}>Address</Text>
+                    <Text style={style.orange}>Balance</Text>
+                    <Text style={style.orange}>Dollar</Text>
                 </View>
                 <View style={{width:"5%",height:"100%",backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"center"}}>
-                    <Text style={{fontSize:15,fontWeight:'bold',color:'orange'}}>:</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold',color:'orange'}}>:</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold',color:'orange'}}>:</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold',color:'orange'}}>:</Text>
+                    <Text style={style.orange}>:</Text>
+                    <Text style={style.orange}>:</Text>
+                    <Text style={style.orange}>:</Text>
+                    <Text style={style.orange}>:</Text>
                 </View>
                 <View style={{height:"100%",flex:1,backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"flex-start"}}>
                     <Text style={{fontSize:15,fontWeight:'bold',alignItems:"center",color:'#fff'}}>{name}</Text>
@@ -300,74 +385,68 @@ const WalletPage = ({navigation,route}) => {
                     <Image
                         style={{width: 25, height: 25}}
                         source={require('../../assets/PNG/Ethereum.png')}/> 
-                        <Text>Buy</Text>
+                        <Text style={{color:"#2d333a"}}>Buy</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>setcount(true)}>
                     <Image
                         style={{width: 25, height: 25}}
                         source={require('../../assets/PNG/Receive.png')}/> 
-                        <Text>Receive</Text>
+                        <Text style={{color:"#2d333a"}}>Receive</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>navigation.navigate('SendEther',{address:address,name:name})}>
                     <Image
                         style={{width: 25, height: 25}}
                         source={require('../../assets/PNG/Send.png')}/>
-                        <Text>Send</Text>
+                        <Text style={{color:"#2d333a"}}>Send</Text>
                     </TouchableOpacity>
             </View>
         </Animated.View>
         :
-        <View style={{flexDirection:"row",justifyContent:"space-between",width:"100%",height:"30%",marginTop:5}}>
-        <View style={{flexDirection:"column",justifyContent:'space-evenly',flex:1,alignItems:'center',backgroundColor:"lightblue",borderTopLeftRadius:10,borderBottomLeftRadius:10}}>
-                    <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}}>
-                    <Image
-                        style={{width: 25, height: 25}}
-                        source={require('../../assets/PNG/Ethereum.png')}/> 
-                        <Text>Buy</Text>
+        <Animated.View style={{transform: [{ translateX: pan.x }, { translateY: pan.y }],flexDirection:"row",justifyContent:"space-between",flex:1}} {...panResponder.panHandlers}>
+            <View style={{flexDirection:"column",justifyContent:'space-evenly',flex:1,alignItems:'center',backgroundColor:"lightblue",borderTopLeftRadius:10,borderBottomLeftRadius:10}}>
+                    <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>navigation.navigate('BuyEther')}>
+                        <Image style={{width: 25, height: 25}} source={require('../../assets/PNG/Ethereum.png')}/> 
+                        <Text style={{color:"#2d333a"}}>Buy</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}}>
-                    <Image
-                        style={{width: 25, height: 25}}
-                        source={require('../../assets/PNG/Receive.png')}/> 
-                        <Text>Receive</Text>
+                    <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>setcount(true)}>
+                        <Image style={{width: 25, height: 25}} source={require('../../assets/PNG/Receive.png')}/> 
+                        <Text style={{color:"#2d333a"}}>Receive</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}}>
-                    <Image
-                        style={{width: 25, height: 25}}
-                        source={require('../../assets/PNG/Send.png')}/>
-                        <Text>Send</Text>
+                    <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>navigation.navigate('SendEther',{address:address,name:name})}>
+                        <Image style={{width: 25, height: 25}} source={require('../../assets/PNG/Send.png')}/>
+                        <Text style={{color:"#2d333a"}}>Send</Text>
                     </TouchableOpacity>
             </View>
-            <View style={{width:"70%",height:"100%",backgroundColor:"lightblue",flexDirection:'row',justifyContent:'flex-start',alignItems:"center",borderTopRightRadius:10,borderBottomRightRadius:10}}>
+            <View style={{width:"70%",height:"100%",backgroundColor:"#002147",flexDirection:'row',justifyContent:'flex-start',alignItems:"center",borderTopRightRadius:10,borderBottomRightRadius:10}}>
                 <View style={{height:"100%",flex:1,backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"flex-end"}}>
-                    <Text style={{fontSize:15,fontWeight:'bold',}}>{name}</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>{address.slice(0, 5)+'...'+address.slice(
+                    <Text style={{fontSize:15,fontWeight:'bold',color:"#fff"}}>{name}</Text>
+                    <Text style={{fontSize:15,fontWeight:'bold',color:"#fff"}}>{address.slice(0, 5)+'...'+address.slice(
                                 address.length - 4,
                                 address.length,
                                 )}</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>{balances?ethers.utils.formatEther(balances):null} ETH</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>${balances?(USD*(ethers.utils.formatEther(balances))).toFixed(2):null}</Text>
+                    <Text style={{fontSize:15,fontWeight:'bold',color:"#fff"}}>{balances?Number(ethers.utils.formatEther(balances)).toFixed(4):null} ETH</Text>
+                    <Text style={{fontSize:15,fontWeight:'bold',color:"#fff"}}>${balances?(USD*(ethers.utils.formatEther(balances))).toFixed(2):null}</Text>
                 </View>
                 <View style={{width:"5%",height:"100%",backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"center"}}>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>:</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>:</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>:</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>:</Text>
+                    <Text style={style.orange}>:</Text>
+                    <Text style={style.orange}>:</Text>
+                    <Text style={style.orange}>:</Text>
+                    <Text style={style.orange}>:</Text>
                 </View>
                 <View style={{width:'30%',height:"100%",backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"flex-start"}}>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>Name</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>Address</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>Balance</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold'}}>Dollar</Text>
+                    <Text style={style.orange}>Name</Text>
+                    <Text style={style.orange}>Address</Text>
+                    <Text style={style.orange}>Balance</Text>
+                    <Text style={style.orange}>Dollar</Text>
                 </View>
             </View>
             
-        </View>}
+        </Animated.View>}
     </View>
         <TabView
       navigationState={{ index, routes }}
       renderScene={renderScene}
-      onIndexChange={setIndex}
+      onIndexChange={index =>{setIndex(index);console.log(index)}}
       initialLayout={initialLayout}
       style={style.containers}
       tabBarPosition="top"
@@ -410,10 +489,44 @@ const WalletPage = ({navigation,route}) => {
 
 export default WalletPage;
 const style = StyleSheet.create({
+    firstView:{
+        flexDirection:"row",justifyContent:"center",alignItems:"center",width:'100%',backgroundColor:"transparent",height:100
+    },
+    secondView:{
+        width:'100%',height:"100%",justifyContent:"space-evenly",flexDirection:"column",padding:6,paddingLeft:5,backgroundColor:"#202020",
+        borderRadius:6,shadowColor: '#002147',shadowOffset: { width: 0, height: 5 },shadowOpacity: 0.34,shadowRadius: 6.27,elevation: 10
+    },
+    thirdView:{
+        alignItems:"flex-start",flexDirection:"row",justifyContent:"space-between",height:"50%",backgroundColor:"transparent"
+    },
+    fourthView:{
+        flexDirection:"column",justifyContent:"space-evenly",height:"100%",width:"60%"
+    },
+    fifthView:{
+        flex:1,height:"100%",backgroundColor:"transparent",flexDirection:"row",alignItems:"center",justifyContent:"space-evenly"
+    },
+    seventhView:{
+        flexDirection:"column",justifyContent:'space-between',alignItems:"center",backgroundColor:"transparent",width:"50%"
+    },
+    eightView:{
+        flexDirection:"row",justifyContent:"space-evenly",backgroundColor:'transparent',alignItems:"center",flex:1
+    },
+    tabBar:{
+        height: 48,backgroundColor:"#fff",width:"35%",flexDirection:"row",justifyContent:"flex-end",alignSelf:"flex-end",marginRight:10,shadowColor:"#fff"
+    },
     text:{
         color:"#fff",
         flexWrap:'wrap',
         fontSize:12
+    },
+    textLeft:{
+        color:"#fff",
+        flexWrap:'wrap',
+        fontSize:12,
+        textAlign:"left"
+    },
+    orange:{
+        fontSize:15,fontWeight:'bold',color:'orange'
     },
     mainView:{
       flexDirection: 'column',
@@ -456,10 +569,12 @@ const style = StyleSheet.create({
         justifyContent: 'center'
     },
     centered: {
-        alignSelf: 'center'
+        alignSelf: 'center',
+        color:"#2d333a"
     },
     containers: {
         marginTop: 0,
+        backgroundColor:"#fff"
       },
       scene: {
         flex: 1,
