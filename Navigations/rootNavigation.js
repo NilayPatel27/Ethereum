@@ -19,6 +19,7 @@ import SendEther from '../src/screens/send/index';
 import AmountPage from '../src/screens/confirmTransaction/amountPage';
 import CofirmTransaction from '../src/screens/confirmTransaction/cofirmTransaction';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Test from '../test';
 const Stack = createNativeStackNavigator();
 
 const screenOptions = {
@@ -28,17 +29,17 @@ const rootNavigation = () => {
 const [isEnabled, setIsEnabled] = useState(false);
 const dispatch = useDispatch();
 var address = useSelector(selectAddress);
-console.log('address',address);
+// console.log('address',address);
 
 // setTimeout(() => {
 //   console.log('address',address);
 // }, 1000);
 useEffect(() => {
-//  AsyncStorage.getItem('address').then(value => {
-//   console.log('value',value);
-//  }  ).catch(err => {
-//   console.log('err',err);
-//   });
+ AsyncStorage.getItem('login').then(value => {
+  console.log('value',value);
+ }  ).catch(err => {
+  console.log('err',err);
+  });
 }, [])
 
   const toggleSwitch = () =>{
@@ -51,8 +52,9 @@ useEffect(() => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="CreateAccount"
+        initialRouteName="HomePage"
         screenOptions={screenOptions}>
+        <Stack.Screen name="Test" component={Test} />
         <Stack.Screen name="CreateAccount" component={CreateAccount} />
         <Stack.Screen name="BuyEther" component={BuyEther} />
         <Stack.Screen name="SendEther" component={SendEther} />

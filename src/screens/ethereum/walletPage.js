@@ -2,17 +2,100 @@ import axios from 'axios';
 import moment from 'moment';
 import { ethers } from 'ethers';
 import Modal from 'react-native-modal';
+import Coin from '../../data/crypto.json';
 import { useSelector } from 'react-redux';
 import QRCode from 'react-native-qrcode-svg';
+import FilterComponent from "./filterComponent";
 import {selectView} from '../../../counterSlice';
+// import { MotiView } from '@motify/components';
 import React,{useState,useEffect,useRef} from 'react'
 import Clipboard from '@react-native-community/clipboard';
 import { TabView, SceneMap,TabBar} from 'react-native-tab-view';
-// import { MotiView } from '@motify/components';
-import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet, ToastAndroid, Share ,TouchableWithoutFeedback,ActivityIndicator,Animated,PanResponder,Dimensions,StatusBar} from 'react-native'
-import { color } from 'react-native-elements/dist/helpers';
+import { LineChart, CandlestickChart } from "react-native-wagmi-charts";
+import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet, ToastAndroid, Share ,TouchableWithoutFeedback,ActivityIndicator,Animated,PanResponder,Dimensions,StatusBar, TextInput} from 'react-native'
+
 
 const WalletPage = ({navigation,route}) => {
+  const [coin, setCoin] = useState(null);
+  const [coinMarketData, setCoinMarketData] = useState(null);
+  const [selectedRange, setSelectedRange] = useState("1");
+  const [usdValue, setUsdValue] = useState("");
+  const [coinCandleChartData, setCoinCandleChartData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [coinValue, setCoinValue] = useState("1");
+  const [isCandleChartVisible, setIsCandleChartVisible] = useState(false);
+
+  
+  const onSelectedRangeChange = (selectedRangeValue) => {
+    setSelectedRange(selectedRangeValue);
+    fetchMarketCoinData(selectedRangeValue);
+    fetchCandleStickChartData(selectedRangeValue);
+  };
+
+  const memoOnSelectedRangeChange = React.useCallback(
+    (range) => onSelectedRangeChange(range),
+    []
+  );
+    const filterDaysArray = [
+        { filterDay: "1", filterText: "24h" },
+        { filterDay: "7", filterText: "7d" },
+        { filterDay: "30", filterText: "30d" },
+        { filterDay: "365", filterText: "1y" },
+        { filterDay: "max", filterText: "All" },
+      ];
+    const fetchMarketCoinData = async (selectedRangeValue) => {
+        const fetchedCoinMarketData = await getCoinMarketChart(
+            'ethereum',
+            selectedRangeValue
+        );
+        setCoinMarketData(fetchedCoinMarketData);
+      };
+
+      const fetchCandleStickChartData = async (selectedRangeValue) => {
+        const fetchedSelectedCandleChartData = await getCandleChartData(
+          'ethereum',
+          selectedRangeValue
+        );
+        setCoinCandleChartData(fetchedSelectedCandleChartData);
+      };
+
+      const getCoinMarketChart = async (coinId, selectedRange) => {
+        try {
+          const response = await axios.get(`https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${selectedRange}&interval=hourly`)
+          return response.data;
+        } catch (e) {
+          console.log(e)
+        }
+      }
+      const getDetailedCoinData = async (coinId) => {
+        try {
+          const response = await axios.get(`https://api.coingecko.com/api/v3/coins/${coinId}?localization=false&tickers=true&market_data=true&community_data=false&developer_data=false&sparkline=false`)
+          return response.data;
+        } catch (e) {
+          console.log(e);
+        }
+      }
+      const getCandleChartData = async (coinId, days = 1) => {
+        try {
+          const response = await axios.get(`https://api.coingecko.com/api/v3/coins/${coinId}/ohlc?vs_currency=usd&days=${days}`)
+          return response.data;
+        } catch (e) {
+          console.log(e);
+        }
+      }
+      const fetchCoinData = async () => {
+        setLoading(true);
+        const fetchedCoinData = await getDetailedCoinData('ethereum');
+        setCoin(fetchedCoinData);
+        setUsdValue(fetchedCoinData.market_data.current_price.usd.toString());
+        setLoading(false);
+      };
+    
+      
+      
+    // const {prices} = Coin
+    
+     const screenWidth = Dimensions.get('window').width;
     const pan = useRef(new Animated.ValueXY()).current;
     const panResponder = useRef(
         PanResponder.create({
@@ -77,10 +160,40 @@ const WalletPage = ({navigation,route}) => {
       axios.get(`https://api-ropsten.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=999&sort=desc&apikey=349IQMJ71CEBWJ65I1U5G5N5NG43C37UZB`).then(res => {
         // console.log(res.data.result)
         settransaction(res.data.result);
+        fetchMarketCoinData(1);
+    fetchCoinData();
+    fetchCandleStickChartData();
         setres(true);
       });
 
     }, [])
+    if (loading || !coin || !coinMarketData || !coinCandleChartData) {
+        return <ActivityIndicator size="large" />;
+    }
+    const {
+        id,
+        image: { small },
+        // name,
+        symbol,
+        market_data: {
+            market_cap_rank,
+            current_price,
+            price_change_percentage_24h,
+        },
+    } = coin;
+    const changeCoinValue = (value) => {
+        setCoinValue(value);
+        const floatValue = parseFloat(value.replace(",", ".")) || 0;
+        setUsdValue((floatValue * current_price.usd).toString());
+      };
+      const changeUsdValue = (value) => {
+        setUsdValue(value);
+        const floatValue = parseFloat(value.replace(",", ".")) || 0;
+        setCoinValue((floatValue / current_price.usd).toString());
+      };
+    
+    const { prices } = coinMarketData;
+
     const copyToClipboard =(index)=>{
         ToastAndroid.show('Address Copied to clipboard', ToastAndroid.SHORT);
          return Clipboard.setString(address);
@@ -296,11 +409,108 @@ const WalletPage = ({navigation,route}) => {
             <Text style={{fontSize:20,fontWeight:'bold',color:"#2d333a"}}>No Tokens</Text>
         </View>
             );
-          const ThirdRoute = () => (
-            <View style={{backgroundColor:"transparent",flex:1,justifyContent:"center",alignItems:"center"}}>
-            <Text style={{fontSize:20,fontWeight:'bold',color:"#2d333a"}}>No Chart</Text>
+           
+          const ThirdRoute = () => {
+              return(
+                <View style={{ paddingHorizontal: 10 }}>
+                    <View style={style.filtersContainer}>
+                        {filterDaysArray.map((day) => (
+                            <FilterComponent
+                            filterDay={day.filterDay}
+                            filterText={day.filterText}
+                            selectedRange={selectedRange}
+                            setSelectedRange={memoOnSelectedRangeChange}
+                            key={day.filterText}
+                            />
+                        ))}
+                    </View>
+                    <View style={{ flexDirection: "row" }}>
+          <View style={{ flexDirection: "row", flex: 1 }}>
+            <Text style={{ color: "#000", alignSelf: "center" }}>
+              {symbol.toUpperCase()}
+            </Text>
+            <TextInput
+              style={style.input}
+              value={coinValue}
+              keyboardType="numeric"
+              onChangeText={changeCoinValue}
+            />
+          </View>
+          <View style={{ flexDirection: "row", flex: 1 }}>
+            <Text style={{ color: "#000", alignSelf: "center" }}>USD</Text>
+            <TextInput
+              style={style.input}
+              value={usdValue}
+              keyboardType="numeric"
+              onChangeText={changeUsdValue}
+            />
+          </View>
         </View>
-            );
+                    <LineChart.Provider data={prices.map(([timestamp, value]) => ({ timestamp, value }))}>
+                        <LineChart height={screenWidth / 2} width={screenWidth}>
+                            <LineChart.Path color='red'/>
+                            <LineChart.CursorCrosshair color='red'>
+                    <LineChart.Tooltip />
+                    </LineChart.CursorCrosshair>
+                        </LineChart>
+                        <LineChart.PriceText />
+                        <LineChart.DatetimeText />
+                    </LineChart.Provider>
+                    {/* <CandlestickChart.Provider
+            data={coinCandleChartData.map(
+              ([timestamp, open, high, low, close]) => ({
+                timestamp,
+                open,
+                high,
+                low,
+                close,
+              })
+            )}
+          >
+            <CandlestickChart height={screenWidth / 2} width={screenWidth}>
+              <CandlestickChart.Candles />
+              <CandlestickChart.Crosshair>
+                <CandlestickChart.Tooltip />
+              </CandlestickChart.Crosshair>
+            </CandlestickChart>
+            <View style={style.candleStickDataContainer}>
+              <View>
+                <Text style={style.candleStickTextLabel}>Open</Text>
+                <CandlestickChart.PriceText
+                  style={style.candleStickText}
+                  type="open"
+                />
+              </View>
+              <View>
+                <Text style={style.candleStickTextLabel}>High</Text>
+                <CandlestickChart.PriceText
+                  style={style.candleStickText}
+                  type="high"
+                />
+              </View>
+              <View>
+                <Text style={style.candleStickTextLabel}>Low</Text>
+                <CandlestickChart.PriceText
+                  style={style.candleStickText}
+                  type="low"
+                />
+              </View>
+              <View>
+                <Text style={style.candleStickTextLabel}>Close</Text>
+                <CandlestickChart.PriceText
+                  style={style.candleStickText}
+                  type="close"
+                />
+              </View>
+            </View>
+            <CandlestickChart.DatetimeText
+              style={{ color: "white", fontWeight: "700", margin: 10 }}
+            />
+          </CandlestickChart.Provider> */}
+
+       
+                </View>
+            )};
           
           const renderScene = SceneMap({
             first: FirstRoute,
@@ -558,6 +768,16 @@ const style = StyleSheet.create({
     actions: {
         height: 56
     },
+    input: {
+        flex: 1,
+        height: 40,
+        margin: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: "#000",
+        padding: 10,
+        fontSize: 16,
+        color: "#000",
+      },
     actionsBar: {
         flexDirection: 'row',
         flex: 3
@@ -579,4 +799,28 @@ const style = StyleSheet.create({
       scene: {
         flex: 1,
       },
+      filtersContainer: {
+        flexDirection: "row",
+        justifyContent: "space-around",
+        backgroundColor: "#2B2B2B",
+        paddingVertical: 5,
+        borderRadius: 5,
+        marginVertical: 10,
+        marginBottom: 20
+      },
+      candleStickText: {
+        color: "white",
+        fontWeight: "700",
+      },
+      candleStickDataContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginHorizontal: 10,
+        marginTop: 20,
+        backgroundColor:"red"
+      },
+      candleStickTextLabel: {
+        color: 'grey',
+        fontSize: 13
+      }
   });

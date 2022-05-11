@@ -12,6 +12,9 @@ import com.facebook.soloader.SoLoader;
 import com.ethereum.newarchitecture.MainApplicationReactNativeHost;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import com.facebook.react.bridge.JSIModulePackage;
+import com.swmansion.reanimated.ReanimatedJSIModulePackage;
+import com.mkuczera.RNReactNativeHapticFeedbackPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -35,6 +38,11 @@ public class MainApplication extends Application implements ReactApplication {
         protected String getJSMainModuleName() {
           return "index";
         }
+
+        @Override
+        protected JSIModulePackage getJSIModulePackage() {
+        return new ReanimatedJSIModulePackage();
+      }
       };
 
   private final ReactNativeHost mNewArchitectureNativeHost =
