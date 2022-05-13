@@ -4,18 +4,17 @@ import { ethers } from 'ethers';
 import Modal from 'react-native-modal';
 import Coin from '../../data/crypto.json';
 import { useSelector } from 'react-redux';
-import QRCode from 'react-native-qrcode-svg';
 import FilterComponent from "./filterComponent";
 import {selectAddress, selectView} from '../../../counterSlice';
 // import { MotiView } from '@motify/components';
 import React,{useState,useEffect,useRef} from 'react';
 import MainInfo from './mainInfo';
-import Clipboard from '@react-native-community/clipboard';
 import { TabView, SceneMap,TabBar} from 'react-native-tab-view';
 import { LineChart, CandlestickChart } from "react-native-wagmi-charts";
-import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet, ToastAndroid, Share ,TouchableWithoutFeedback,ActivityIndicator,Animated,PanResponder,Dimensions,StatusBar, TextInput} from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ToastAndroid, Share ,TouchableWithoutFeedback,ActivityIndicator,Animated,PanResponder,Dimensions,StatusBar, TextInput} from 'react-native';
 
 const WalletPage = ({navigation,route}) => {
+  const {address,name} = route.params;
   let allAddress = useSelector(selectAddress);
   const [coin, setCoin] = useState(null);
   const [coinMarketData, setCoinMarketData] = useState(null);
@@ -25,7 +24,6 @@ const WalletPage = ({navigation,route}) => {
   const [loading, setLoading] = useState(false);
   const [coinValue, setCoinValue] = useState("1");
   const [isCandleChartVisible, setIsCandleChartVisible] = useState(false);
-  const [data, setdata] = useState([])
 
   
   const onSelectedRangeChange = (selectedRangeValue) => {
@@ -92,14 +90,10 @@ const WalletPage = ({navigation,route}) => {
         setUsdValue(fetchedCoinData.market_data.current_price.usd.toString());
         setLoading(false);
       };
-
-      const addressList = async () =>{
-        for(let i=0;i<allAddress.length;i++){
-          console.log(allAddress[i].address)
-          if(data.includes(allAddress[i])==false){
-          setdata(data =>[...data,allAddress[i]])
-        }
-      }
+      const fetchCoinDatas = async () => {
+        const fetchedCoinData = await getDetailedCoinData('ethereum');
+        setCoin(fetchedCoinData);
+        setUsdValue(fetchedCoinData.market_data.current_price.usd.toString());
       }
     // const {prices} = Coin
     
@@ -150,8 +144,6 @@ const WalletPage = ({navigation,route}) => {
     { key: 'third', title: 'Chart' },
 
   ]);
-    const {address,name} = route.params;
-    const [count, setcount] = useState(false);
     const USD =Number('2824.96');
     // let isListGliding = useRef(false);
     const [balances, setbalances] = useState(null);
@@ -169,7 +161,6 @@ const WalletPage = ({navigation,route}) => {
       axios.get(`https://api-ropsten.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=999&sort=desc&apikey=349IQMJ71CEBWJ65I1U5G5N5NG43C37UZB`).then(res => {
         // console.log(res.data.result)
         settransaction(res.data.result);
-        addressList();
         fetchMarketCoinData(1);
         fetchCoinData();
         fetchCandleStickChartData();
@@ -178,7 +169,7 @@ const WalletPage = ({navigation,route}) => {
      
     }, [])
     if (loading || !coin || !coinMarketData || !coinCandleChartData) {
-        return <ActivityIndicator size="large" />;
+        return <ActivityIndicator size="large" color="#0000ff" style={{flex:1,justifyContent:"center",alignItems:"center",flexDirection:"row"}} />;
     }
     const {
         id,
@@ -196,6 +187,7 @@ const WalletPage = ({navigation,route}) => {
         const floatValue = parseFloat(value.replace(",", ".")) || 0;
         setUsdValue((floatValue * current_price.usd).toString());
       };
+
       const changeUsdValue = (value) => {
         setUsdValue(value);
         const floatValue = parseFloat(value.replace(",", ".")) || 0;
@@ -204,40 +196,22 @@ const WalletPage = ({navigation,route}) => {
     
     const { prices } = coinMarketData;
 
-    const copyToClipboard =(index)=>{
-        ToastAndroid.show('Address Copied to clipboard', ToastAndroid.SHORT);
-         return Clipboard.setString(address);
-      }
-      const share = () => {
-             Share.share({
-                message: address,
-            });
-        }
-            const renderColumn = (icon, label, action) => (
-            <TouchableWithoutFeedback onPress={action}>
-                <View style={style.actionColumn}>
-                    {/* <Icon name={icon} style={styles.actionIcon} /> */}
-                    {icon=='copy'?
-                    <Image 
-                        source={require('../../assets/PNG/copy.png')}
-                        style={{height:25,width:25}}
-                    />:<Image 
-                    source={require('../../assets/PNG/Send.png')}
-                    style={{height:25,width:25}}
-                />}
-                    <Text style={{color:"#2d333a"}}>{label}</Text>
-                </View>
-            </TouchableWithoutFeedback>
-        );
+    
         const onLayout=(event)=> {
             const {x, y, height, width} = event.nativeEvent.layout;
             // console.log(x, y, height, width);
           }
 
           const relodeData = () => {
+            console.log('reload')
+            setres(false);
             fetchMarketCoinData(1);
-            fetchCoinData();
+            fetchCoinDatas();
             fetchCandleStickChartData();
+            setTimeout(() => {
+              
+              setres(true)
+            }, 1000);
           }
         //   const LoadingIndicator = ({size}) => {
         //       return(
@@ -281,8 +255,11 @@ const WalletPage = ({navigation,route}) => {
             <View style={{flex:1,justifyContent:"flex-start",flexDirection:'column',backgroundColor:"#fff",padding:10}}>
         {res==false
         ?
-        // <LoadingIndicator size={100}/>
+        <>
+        {console.log('reloadddddd')}
+        {/* // <LoadingIndicator size={100}/> */}
         <ActivityIndicator  size="small" color="#0000ff" style={{flex:1,justifyContent:"center",alignItems:"center",flexDirection:"row"}}/>
+        </>
         :
         <>
             {transaction.length==0?<View style={{backgroundColor:"transparent",flex:1,justifyContent:"center",alignItems:"center"}}>
@@ -421,13 +398,19 @@ const WalletPage = ({navigation,route}) => {
             }
           
           const SecondRoute = () => (
+            res==false
+              ?<ActivityIndicator  size="small" color="#0000ff" style={{flex:1,justifyContent:"center",alignItems:"center",flexDirection:"row"}}/>
+              :
             <View style={{backgroundColor:"transparent",flex:1,justifyContent:"center",alignItems:"center"}}>
             <Text style={{fontSize:20,fontWeight:'bold',color:"#2d333a"}}>No Tokens</Text>
         </View>
+
             );
            
           const ThirdRoute = () => {
               return(
+                res==false
+                ?<ActivityIndicator  size="small" color="#0000ff" style={{flex:1,justifyContent:"center",alignItems:"center",flexDirection:"row"}}/>:
                 <View style={{ paddingHorizontal: 10 }}>
                     <View style={style.filtersContainer}>
                         {filterDaysArray.map((day) => (
@@ -449,7 +432,7 @@ const WalletPage = ({navigation,route}) => {
               style={style.input}
               value={coinValue}
               keyboardType="numeric"
-              onChangeText={changeCoinValue}
+              onChangeText={number =>changeCoinValue(number)}
             />
           </View>
           <View style={{ flexDirection: "row", flex: 1 }}>
@@ -458,7 +441,7 @@ const WalletPage = ({navigation,route}) => {
               style={style.input}
               value={usdValue}
               keyboardType="numeric"
-              onChangeText={changeUsdValue}
+              onChangeText={number =>changeUsdValue(number)}
             />
           </View>
         </View>
@@ -585,11 +568,10 @@ const WalletPage = ({navigation,route}) => {
         };
   return (
       <>
-    <View style={{height:"50%",width:"100%",backgroundColor:"#fff",padding:15,flexDirection:'column',justifyContent:"flex-start"}}>
+    <View style={{height:"30%",width:"100%",backgroundColor:"#fff",padding:15,flexDirection:'column',justifyContent:"flex-start"}}>
         {sideview==true?
         <>
-          <MainInfo data={data} address={address}/>
-        
+          <MainInfo address={address} navigation={navigation} name={name}/>
         </>
         :
         <Animated.View style={{transform: [{ translateX: pan.x }, { translateY: pan.y }],flexDirection:"row",justifyContent:"space-between",flex:1}} {...panResponder.panHandlers}>
@@ -633,6 +615,7 @@ const WalletPage = ({navigation,route}) => {
             
         </Animated.View>}
     </View>
+    
         <TabView
       navigationState={{ index, routes }}
       renderScene={renderScene}
@@ -644,35 +627,7 @@ const WalletPage = ({navigation,route}) => {
 
     />
    
-    <Modal
-        isVisible={count}
-        animationType={'fade'}
-        transparent={true}
-        onRequestClose={() => {
-          setcount(false);
-        }}
-        onBackdropPress={() => {
-          setcount(false);
-        }}
-        // backdropTransitionOutTiming={100}
-        // animationIn={'zoomIn'}
-        // animationOut={'zoomOut'}
-        // animationOutTiming={1}
-      >
-        <View style={style.container}>
-                <Text style={style.centered}>Show the code below to receive coins</Text>
-                <View style={style.centered}>
-                    <QRCode size={200} value={address} /> 
-                </View>
-                <Text style={style.centered}>{address}</Text>
-                <View style={style.actions}>
-                    <View style={style.actionsBar}>
-                        {renderColumn('copy', 'Copy', () => copyToClipboard())}
-                        {renderColumn('share', 'Share', () => share())}
-                    </View>
-                </View>
-            </View>
-      </Modal>
+    
     </>
   )
 }
@@ -683,7 +638,7 @@ const style = StyleSheet.create({
         flexDirection:"row",justifyContent:"center",alignItems:"center",width:'100%',backgroundColor:"transparent",height:100
     },
     secondView:{
-        width:'100%',height:"100%",justifyContent:"space-evenly",flexDirection:"column",padding:6,paddingLeft:5,backgroundColor:"#202020",
+        width:'100%',height:"100%",justifyContent:"space-evenly",flexDirection:"column",padding:6,paddingLeft:5,backgroundColor:"#2c2e3b",
         borderRadius:6,shadowColor: '#002147',shadowOffset: { width: 0, height: 5 },shadowOpacity: 0.34,shadowRadius: 6.27,elevation: 10
     },
     thirdView:{

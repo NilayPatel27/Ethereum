@@ -94,9 +94,8 @@ const HomePage = ({navigation}) => {
             onRefresh={refetchCoins}
           />
         }
+        keyExtractor={(item, index) => index.toString()}
       />
-        <Text style={{color: 'lightgrey', fontSize: 12, paddingHorizontal: 10}}>Powered by CoinGecko</Text>
-
       </View>
     </>
   );
