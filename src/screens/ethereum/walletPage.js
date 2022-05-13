@@ -6,16 +6,17 @@ import Coin from '../../data/crypto.json';
 import { useSelector } from 'react-redux';
 import QRCode from 'react-native-qrcode-svg';
 import FilterComponent from "./filterComponent";
-import {selectView} from '../../../counterSlice';
+import {selectAddress, selectView} from '../../../counterSlice';
 // import { MotiView } from '@motify/components';
-import React,{useState,useEffect,useRef} from 'react'
+import React,{useState,useEffect,useRef} from 'react';
+import MainInfo from './mainInfo';
 import Clipboard from '@react-native-community/clipboard';
 import { TabView, SceneMap,TabBar} from 'react-native-tab-view';
 import { LineChart, CandlestickChart } from "react-native-wagmi-charts";
-import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet, ToastAndroid, Share ,TouchableWithoutFeedback,ActivityIndicator,Animated,PanResponder,Dimensions,StatusBar, TextInput} from 'react-native'
-
+import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet, ToastAndroid, Share ,TouchableWithoutFeedback,ActivityIndicator,Animated,PanResponder,Dimensions,StatusBar, TextInput} from 'react-native';
 
 const WalletPage = ({navigation,route}) => {
+  let allAddress = useSelector(selectAddress);
   const [coin, setCoin] = useState(null);
   const [coinMarketData, setCoinMarketData] = useState(null);
   const [selectedRange, setSelectedRange] = useState("1");
@@ -24,6 +25,7 @@ const WalletPage = ({navigation,route}) => {
   const [loading, setLoading] = useState(false);
   const [coinValue, setCoinValue] = useState("1");
   const [isCandleChartVisible, setIsCandleChartVisible] = useState(false);
+  const [data, setdata] = useState([])
 
   
   const onSelectedRangeChange = (selectedRangeValue) => {
@@ -90,9 +92,15 @@ const WalletPage = ({navigation,route}) => {
         setUsdValue(fetchedCoinData.market_data.current_price.usd.toString());
         setLoading(false);
       };
-    
-      
-      
+
+      const addressList = async () =>{
+        for(let i=0;i<allAddress.length;i++){
+          console.log(allAddress[i].address)
+          if(data.includes(allAddress[i])==false){
+          setdata(data =>[...data,allAddress[i]])
+        }
+      }
+      }
     // const {prices} = Coin
     
      const screenWidth = Dimensions.get('window').width;
@@ -155,17 +163,19 @@ const WalletPage = ({navigation,route}) => {
         axios.get(`https://api-ropsten.etherscan.io/api?module=account&action=balance&address=${address}&apikey=349IQMJ71CEBWJ65I1U5G5N5NG43C37UZB&tag=latest`).then(res => { 
         // console.log(res.data.result)
           setbalances(res.data.result);
+
       });
 
       axios.get(`https://api-ropsten.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=999&sort=desc&apikey=349IQMJ71CEBWJ65I1U5G5N5NG43C37UZB`).then(res => {
         // console.log(res.data.result)
         settransaction(res.data.result);
+        addressList();
         fetchMarketCoinData(1);
-    fetchCoinData();
-    fetchCandleStickChartData();
+        fetchCoinData();
+        fetchCandleStickChartData();
         setres(true);
       });
-
+     
     }, [])
     if (loading || !coin || !coinMarketData || !coinCandleChartData) {
         return <ActivityIndicator size="large" />;
@@ -222,6 +232,12 @@ const WalletPage = ({navigation,route}) => {
         const onLayout=(event)=> {
             const {x, y, height, width} = event.nativeEvent.layout;
             // console.log(x, y, height, width);
+          }
+
+          const relodeData = () => {
+            fetchMarketCoinData(1);
+            fetchCoinData();
+            fetchCandleStickChartData();
           }
         //   const LoadingIndicator = ({size}) => {
         //       return(
@@ -449,7 +465,7 @@ const WalletPage = ({navigation,route}) => {
                     <LineChart.Provider data={prices.map(([timestamp, value]) => ({ timestamp, value }))}>
                         <LineChart height={screenWidth / 2} width={screenWidth}>
                             <LineChart.Path color='red'/>
-                            <LineChart.CursorCrosshair color='red'>
+                            <LineChart.CursorCrosshair >
                     <LineChart.Tooltip />
                     </LineChart.CursorCrosshair>
                         </LineChart>
@@ -535,9 +551,14 @@ const WalletPage = ({navigation,route}) => {
           const renderTabBar = (props) => {
             return (
                 <>
-                <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"center"}}>
+                <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"center",backgroundColor:"transparent"}}>
                 <Text style={{paddingLeft:10,fontWeight:"bold",fontSize:20,color:"#2d333a"}}>{routes[index].title}</Text>
-                    <TabBar
+                <TouchableOpacity style={{marginRight:"auto",marginLeft:10}} onPress={()=>relodeData()}>
+                  <Image
+                  style={{width: 20, height: 20}}
+                  source={require('../../assets/PNG/refresh.png')}/>
+                </TouchableOpacity>
+                <TabBar
                         {...props}
                         // onTabPress={({ route, preventDefault }) => {
                         //     // if (isListGliding.current) {
@@ -564,53 +585,12 @@ const WalletPage = ({navigation,route}) => {
         };
   return (
       <>
-    <View style={{height:"30%",width:"100%",backgroundColor:"#fff",padding:15,flexDirection:'column',justifyContent:"flex-start"}}>
+    <View style={{height:"50%",width:"100%",backgroundColor:"#fff",padding:15,flexDirection:'column',justifyContent:"flex-start"}}>
         {sideview==true?
-        <Animated.View style={{transform: [{ translateX: pan.x }, { translateY: pan.y }],flexDirection:"row",justifyContent:"space-between",flex:1}} {...panResponder.panHandlers} >
-            <View style={{width:"70%",height:"100%",backgroundColor:"#002147",flexDirection:'row',justifyContent:'flex-start',alignItems:"center",borderTopLeftRadius:10,borderBottomLeftRadius:10}}>
-                <View style={{width:'30%',height:"100%",backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"flex-end"}}>
-                    <Text style={style.orange}>Name</Text>
-                    <Text style={style.orange}>Address</Text>
-                    <Text style={style.orange}>Balance</Text>
-                    <Text style={style.orange}>Dollar</Text>
-                </View>
-                <View style={{width:"5%",height:"100%",backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"center"}}>
-                    <Text style={style.orange}>:</Text>
-                    <Text style={style.orange}>:</Text>
-                    <Text style={style.orange}>:</Text>
-                    <Text style={style.orange}>:</Text>
-                </View>
-                <View style={{height:"100%",flex:1,backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"flex-start"}}>
-                    <Text style={{fontSize:15,fontWeight:'bold',alignItems:"center",color:'#fff'}}>{name}</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold',color:'#fff'}}>{address.slice(0, 5)+'...'+address.slice(
-                                address.length - 4,
-                                address.length,
-                                )}</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold',color:'#fff'}}>{balances?Number(ethers.utils.formatEther(balances)).toFixed(4):null} ETH</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold',color:'#fff'}}>${balances?(USD*(ethers.utils.formatEther(balances))).toFixed(2):null}</Text>
-                </View>
-            </View>
-            <View style={{flexDirection:"column",justifyContent:'space-evenly',flex:1,alignItems:'center',backgroundColor:"lightblue",borderTopRightRadius:10,borderBottomRightRadius:10}}>
-                    <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>navigation.navigate('BuyEther')}>
-                    <Image
-                        style={{width: 25, height: 25}}
-                        source={require('../../assets/PNG/Ethereum.png')}/> 
-                        <Text style={{color:"#2d333a"}}>Buy</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>setcount(true)}>
-                    <Image
-                        style={{width: 25, height: 25}}
-                        source={require('../../assets/PNG/Receive.png')}/> 
-                        <Text style={{color:"#2d333a"}}>Receive</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>navigation.navigate('SendEther',{address:address,name:name})}>
-                    <Image
-                        style={{width: 25, height: 25}}
-                        source={require('../../assets/PNG/Send.png')}/>
-                        <Text style={{color:"#2d333a"}}>Send</Text>
-                    </TouchableOpacity>
-            </View>
-        </Animated.View>
+        <>
+          <MainInfo data={data} address={address}/>
+        
+        </>
         :
         <Animated.View style={{transform: [{ translateX: pan.x }, { translateY: pan.y }],flexDirection:"row",justifyContent:"space-between",flex:1}} {...panResponder.panHandlers}>
             <View style={{flexDirection:"column",justifyContent:'space-evenly',flex:1,alignItems:'center',backgroundColor:"lightblue",borderTopLeftRadius:10,borderBottomLeftRadius:10}}>

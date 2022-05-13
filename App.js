@@ -6,10 +6,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ActivityIndicator } from 'react-native';
 import NewSplash from './src/screens/NewSplash';
 
-// import firestore from '@react-native-firebase/firestore';
-// import { ethers } from 'ethers';
-
-
 const App = () => {
   // useEffect(() => {
   //   getuser()

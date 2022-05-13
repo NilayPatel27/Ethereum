@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, TextInput, Button, Switch, ToastAndroid } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React,{useEffect, useRef,useState} from 'react';
+import {View, Text, Image, TouchableOpacity, TextInput, Button, Switch, ToastAndroid, ActivityIndicator} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Counter from '../Counter';
 import CreateAccount from '../src/screens/createAccount';
 import CreateMnemonics from '../src/screens/createMnemonics';
@@ -13,7 +13,7 @@ import ImportAccount from '../src/screens/importAccount';
 import RBSheet from "react-native-raw-bottom-sheet";
 import WalletPage from '../src/screens/ethereum/walletPage';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectAddress, view } from '../counterSlice';
+import { login, selectAddress, selectLogin, view } from '../counterSlice';
 import BuyEther from '../src/screens/buyEther';
 import SendEther from '../src/screens/send/index';
 import AmountPage from '../src/screens/confirmTransaction/amountPage';
@@ -21,6 +21,7 @@ import CofirmTransaction from '../src/screens/confirmTransaction/cofirmTransacti
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Test from '../test';
 import NewSplash from '../src/screens/NewSplash';
+import Card from '../src/screens/ethereum/Card';
 const Stack = createNativeStackNavigator();
 
 const screenOptions = {
@@ -56,6 +57,7 @@ const rootNavigation = ({ loginValue }) => {
 
   console.log('loginValue', loginValue);
   return (
+    
     <NavigationContainer>
       <Stack.Navigator
         initialRouteName={loginValue === "true" ? 'HomePage' : 'CreateAccount'}
@@ -67,6 +69,7 @@ const rootNavigation = ({ loginValue }) => {
         <Stack.Screen name="Test" component={Test} />
         <Stack.Screen name="CreateAccount" component={CreateAccount} />
         <Stack.Screen name="BuyEther" component={BuyEther} />
+        <Stack.Screen name="Card" component={Card} />
         <Stack.Screen name="SendEther" component={SendEther} />
         <Stack.Screen name="CreateMnemonics" component={CreateMnemonics} />
         <Stack.Screen name="ConfirmMnemonics" component={ConfirmMnemonics} />
