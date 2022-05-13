@@ -1,7 +1,7 @@
-import React,{useEffect, useRef,useState} from 'react';
-import {View, Text, Image, TouchableOpacity, TextInput, Button, Switch, ToastAndroid} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, Image, TouchableOpacity, TextInput, Button, Switch, ToastAndroid } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Counter from '../Counter';
 import CreateAccount from '../src/screens/createAccount';
 import CreateMnemonics from '../src/screens/createMnemonics';
@@ -20,40 +20,50 @@ import AmountPage from '../src/screens/confirmTransaction/amountPage';
 import CofirmTransaction from '../src/screens/confirmTransaction/cofirmTransaction';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Test from '../test';
+import NewSplash from '../src/screens/NewSplash';
 const Stack = createNativeStackNavigator();
 
 const screenOptions = {
   headerShown: true,
 };
-const rootNavigation = () => {
-const [isEnabled, setIsEnabled] = useState(false);
-const dispatch = useDispatch();
-var address = useSelector(selectAddress);
-// console.log('address',address);
+const rootNavigation = ({ loginValue }) => {
+  const [isEnabled, setIsEnabled] = useState(false);
+  const dispatch = useDispatch();
+  var address = useSelector(selectAddress);
 
-// setTimeout(() => {
-//   console.log('address',address);
-// }, 1000);
-useEffect(() => {
- AsyncStorage.getItem('login').then(value => {
-  console.log('value',value);
- }  ).catch(err => {
-  console.log('err',err);
-  });
-}, [])
+  // console.log('address',address);
 
-  const toggleSwitch = () =>{
+  // setTimeout(() => {
+  //   console.log('address',address);
+  // }, 1000);
+  // useEffect(() => {
+  //   AsyncStorage.getItem('login').then(value => {
+  //     console.log('value', value);
+  //   }).catch(err => {
+  //     console.log('err', err);
+  //   });
+  // }, [])
+
+  const toggleSwitch = () => {
     setIsEnabled(previousState => !previousState);
-    {isEnabled ?
-    ToastAndroid.show('Left handed view enabled', ToastAndroid.SHORT):
-    ToastAndroid.show('Right handed view enabled', ToastAndroid.SHORT)}
+    {
+      isEnabled ?
+        ToastAndroid.show('Left handed view enabled', ToastAndroid.SHORT) :
+        ToastAndroid.show('Right handed view enabled', ToastAndroid.SHORT)
+    }
     dispatch(view(!isEnabled));
-  } 
+  }
+
+  console.log('loginValue', loginValue);
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="HomePage"
+        initialRouteName={loginValue === "true" ? 'HomePage' : 'CreateAccount'}
         screenOptions={screenOptions}>
+        {/* <Stack.Screen name="NewSplash" component={NewSplash} loginValue={loginValue} /> */}
+        {/* <Stack.Screen name='NewSplash' options={{ title: 'NewSplash' }}>
+          {(props) => <NewSplash {...props} />}
+        </Stack.Screen> */}
         <Stack.Screen name="Test" component={Test} />
         <Stack.Screen name="CreateAccount" component={CreateAccount} />
         <Stack.Screen name="BuyEther" component={BuyEther} />
@@ -63,25 +73,26 @@ useEffect(() => {
         <Stack.Screen name="ConfirmBox" component={ConfirmBox} />
         <Stack.Screen name="AmountPage" component={AmountPage} />
         <Stack.Screen name="CofirmTransaction" component={CofirmTransaction} />
-        <Stack.Screen name="HomePage" options={({navigation}) => ({
+        <Stack.Screen name="HomePage" options={({ navigation }) => ({
           headerTitle: 'HomePage',
           headerRight: () => (
             <>
-            <Switch
-            trackColor={{ false: "#767577", true: "#81b0ff" }}
-            thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={toggleSwitch}
-            value={isEnabled}
-            />
+              <Switch
+                trackColor={{ false: "#767577", true: "#81b0ff" }}
+                thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={toggleSwitch}
+                value={isEnabled}
+              />
             </>
-          )} 
-          )} component={HomePage} />
+          )
+        }
+        )} component={HomePage} />
         <Stack.Screen name="Accounts" component={Ethereum} />
-          <Stack.Screen name="ImportAccount" component={ImportAccount} />
-          <Stack.Screen name="WalletPage" component={WalletPage} />
+        <Stack.Screen name="ImportAccount" component={ImportAccount} />
+        <Stack.Screen name="WalletPage" component={WalletPage} />
       </Stack.Navigator>
-    </NavigationContainer>
+    </NavigationContainer >
   );
 };
 

@@ -1,19 +1,35 @@
-import {View, Text, TouchableOpacity, StyleSheet, Dimensions,Alert} from 'react-native';
-import React, {useRef} from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Alert } from 'react-native';
+import React, { useRef } from 'react';
 import _ from 'lodash';
 import { ethers } from 'ethers';
 import ConfirmBox from './ConfirmBox';
 import { useDispatch, useSelector } from 'react-redux';
 import converter from 'number-to-words';
 import { addressArray, selectAddress } from '../../../counterSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const windowWidth = Dimensions.get('window').width;
 
-const ConfirmMnemonics = ({navigation, route}) => {
-  const {mnemonic} = route.params;
+const ConfirmMnemonics = ({ navigation, route }) => {
+  const { mnemonic } = route.params;
   const Confirm = useRef();
   const dispatch = useDispatch();
   var address = useSelector(selectAddress);
+
+  const _storeData = async () => {
+    try {
+      await AsyncStorage.setItem(
+        "login", "true"
+      );
+    } catch (error) {
+      // Error saving data
+    }
+  };
+
+  // const resetAction = StackActions.reset({
+  //   index: 0,
+  //   actions: [NavigationActions.navigate({ routeName: 'HomePage' })],
+  // });
 
 
   const onPressConfirm = () => {
@@ -21,27 +37,32 @@ const ConfirmMnemonics = ({navigation, route}) => {
     //   Alert.alert('Invalid sequence', 'Please select the correct sequence');
     //   return null;
     // }
-    const wallet = loadWalletFromMnemonics(mnemonic);
-    console.log(wallet.privateKey);
-    let obj = {
-      name: converter.toWordsOrdinal(address.length),
-      address:wallet.address,
-      wallet:wallet,
-      privateKey:wallet.privateKey,
-    }
-    for(let i = 0; i < address.length; i++){
-      if(address[i].address === wallet.address){
-        return;
-      }
-    }
-    dispatch(addressArray(obj));
-    navigation.navigate('HomePage');
+    _storeData();
+    // navigation.dispatch(resetAction);
+    // const wallet = loadWalletFromMnemonics(mnemonic);
+    // console.log(wallet.privateKey);
+    // let obj = {
+    //   name: converter.toWordsOrdinal(address.length),
+    //   address: wallet.address,
+    //   wallet: wallet,
+    //   privateKey: wallet.privateKey,
+    // }
+    // for (let i = 0; i < address.length; i++) {
+    //   if (address[i].address === wallet.address) {
+    //     return;
+    //   }
+    // }
+    // dispatch(addressArray(obj));
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'HomePage' }],
+    });
     // navigation.navigate('HomePage',{wallet});
     console.log('Confirm');
   };
-const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
+  const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
 
-  const loadWalletFromMnemonics =(mnemonics) => {
+  const loadWalletFromMnemonics = (mnemonics) => {
     console.log(mnemonics);
     console.log(!(mnemonics instanceof Array));
     console.log(typeof mnemonics !== 'string');
@@ -54,23 +75,23 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
     console.log(typeof mnemonics == 'string');
     console.log(mnemonics);
     // console.log(ethers.utils.isValidMnemonic(mnemonics));
-    let wallet1 =  ethers.Wallet.fromMnemonic(mnemonics);
-    console.log('wallet1',wallet1);
+    let wallet1 = ethers.Wallet.fromMnemonic(mnemonics);
+    console.log('wallet1', wallet1);
     wallet1 = wallet1.connect(PROVIDER);
     // console.log(wallet1)
     return wallet1;
   }
-  
+
   return (
     <>
-        <ConfirmBox ref={Confirm} mnemonic={mnemonic} />
-        <View style={{backgroundColor: '#14213D', paddingBottom: 10}}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={()=>onPressConfirm()}>
-              <Text style={styles.title}>Confirm</Text>
-            </TouchableOpacity>
-          </View>
+      <ConfirmBox ref={Confirm} mnemonic={mnemonic} />
+      <View style={{ backgroundColor: '#14213D', paddingBottom: 10 }}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => onPressConfirm()}>
+          <Text style={styles.title}>Confirm</Text>
+        </TouchableOpacity>
+      </View>
     </>
   );
 };
@@ -82,18 +103,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexWrap: 'wrap',
     maxWidth: '100%',
-    marginTop:'70%',
+    marginTop: '70%',
     // backgroundColor:"blue"
   },
-  renderMnemonic:{
+  renderMnemonic: {
     backgroundColor: 'lightblue',
     padding: 8,
     borderWidth: 1,
     borderColor: '#1E1E1E',
     borderRadius: 4,
-    width:windowWidth/4,
-    justifyContent:'center',
-    alignItems:"center"
+    width: windowWidth / 4,
+    justifyContent: 'center',
+    alignItems: "center"
   },
   button: {
     height: 48,
