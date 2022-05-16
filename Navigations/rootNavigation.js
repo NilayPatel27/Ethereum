@@ -19,12 +19,22 @@ import SendEther from '../src/screens/send/index';
 import AmountPage from '../src/screens/confirmTransaction/amountPage';
 import CofirmTransaction from '../src/screens/confirmTransaction/cofirmTransaction';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import Test from '../test';
 import NewSplash from '../src/screens/NewSplash';
+import CoinItem from '../src/screens/ethereum/coinItem';
 const Stack = createNativeStackNavigator();
 
 const screenOptions = {
   headerShown: true,
+  headerTintColor: "#fff",
+  headerStyle: {
+    backgroundColor: '#2c2e3b',
+  },
+  headerTitleStyle: {
+    color: 'white',
+    fontSize: 30,
+  }
 };
 const rootNavigation = ({ loginValue }) => {
   const [isEnabled, setIsEnabled] = useState(false);
@@ -74,10 +84,11 @@ const rootNavigation = ({ loginValue }) => {
         <Stack.Screen name="AmountPage" component={AmountPage} />
         <Stack.Screen name="CofirmTransaction" component={CofirmTransaction} />
         <Stack.Screen name="HomePage" options={({ navigation }) => ({
-          headerTitle: 'HomePage',
+          headerTitle: 'Dashboard',
           headerRight: () => (
             <>
               <Switch
+                style={{}}
                 trackColor={{ false: "#767577", true: "#81b0ff" }}
                 thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
                 ios_backgroundColor="#3e3e3e"
@@ -91,6 +102,7 @@ const rootNavigation = ({ loginValue }) => {
         <Stack.Screen name="Accounts" component={Ethereum} />
         <Stack.Screen name="ImportAccount" component={ImportAccount} />
         <Stack.Screen name="WalletPage" component={WalletPage} />
+        <Stack.Screen name="CoinItem" component={CoinItem} />
       </Stack.Navigator>
     </NavigationContainer >
   );
