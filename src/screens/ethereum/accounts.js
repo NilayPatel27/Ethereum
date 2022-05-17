@@ -18,11 +18,12 @@ import {addressArray, selectAddress, selectView} from '../../../counterSlice';
 import Back from '../../assets/BackButton.svg'
 import { View, Text, Image, TouchableOpacity, StyleSheet, ToastAndroid, Share ,Button,TouchableWithoutFeedback,ActivityIndicator,Animated,PanResponder,Dimensions,StatusBar, TextInput, Pressable} from 'react-native';
 import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
+import FirstTab from './tabPages/firstTab';
+import SecondTab from './tabPages/secondTab';
+import ThirdTab from './tabPages/thirdTab';
 
 const WalletPage = ({navigation,route}) => {
   const {image} = route.params;
-  console.log('coins',image);
-  // const {address,name} = route.params;
   let allAddress = useSelector(selectAddress);
   const refRBSheet = useRef();
   const textValue = useRef();
@@ -35,6 +36,7 @@ const WalletPage = ({navigation,route}) => {
   const [coinCandleChartData, setCoinCandleChartData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [coinValue, setCoinValue] = useState("1");
+  const [load, setload] = useState(false)
   const dispatch = useDispatch();
   const [isCandleChartVisible, setIsCandleChartVisible] = useState(false);
 
@@ -46,8 +48,11 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
     fetchCandleStickChartData(selectedRangeValue);
   };
 
-  const memoOnSelectedRangeChange = React.useCallback(
-    (range) => onSelectedRangeChange(range),
+  const memoOnSelectedRangeChange = React.useCallback((range) => {setload(true);onSelectedRangeChange(range);
+  setTimeout(() => {
+    setload(false);
+  }, 1000);
+  },
     []
   );
     const filterDaysArray = [
@@ -136,15 +141,15 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
         try{
           let wallet = new ethers.Wallet(privateKey,PROVIDER);
           wallet= wallet.connect(PROVIDER);
-          console.log(wallet.address);
+          console.log(wallet);
           let obj = {
-            name: converter.toWordsOrdinal(address.length),
+            name: converter.toWordsOrdinal(allAddress.length),
             address:wallet.address,
             wallet:wallet,
             privateKey:wallet.privateKey,
           }
-          for(let i = 0; i < address.length; i++){
-            if(address[i].address === wallet.address){
+          for(let i = 0; i < allAddress.length; i++){
+            if(allAddress[i].address === wallet.address){
               return;
             }
           }
@@ -152,7 +157,7 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
         refRBSheet.current.close()
         }
         catch(e){
-          console.log('invalid private key');
+          console.log(e);
         } 
       }
     // const {prices} = Coin
@@ -228,9 +233,11 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
       });
      
     }, []);
+    
     if (loading || !coin || !coinMarketData || !coinCandleChartData) {
         return <ActivityIndicator size="large" color="#0000ff" style={{flex:1,justifyContent:"center",alignItems:"center",flexDirection:"row"}} />;
     }
+
     const {
         id,
         image: { small },
@@ -242,340 +249,22 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
             price_change_percentage_24h,
         },
     } = coin;
-    const changeCoinValue = (value) => {
-        setCoinValue(value);
-        const floatValue = parseFloat(value.replace(",", ".")) || 0;
-        setUsdValue((floatValue * current_price.usd).toString());
-      };
-
-      const changeUsdValue = (value) => {
-        setUsdValue(value);
-        const floatValue = parseFloat(value.replace(",", ".")) || 0;
-        setCoinValue((floatValue / current_price.usd).toString());
-      };
-    
     const { prices } = coinMarketData;
 
-    
-        const onLayout=(event)=> {
-            const {x, y, height, width} = event.nativeEvent.layout;
-            // console.log(x, y, height, width);
-          }
-
           const relodeData = () => {
-            // console.log('reload')
             setres(false);
             fetchMarketCoinData(1);
             fetchCoinDatas();
             fetchCandleStickChartData();
             setTimeout(() => {
-              
               setres(true)
             }, 1000);
           }
-        //   const LoadingIndicator = ({size}) => {
-        //       return(
-        //          <MotiView
-        //          from ={{
-        //             width:size,
-        //             height:size,
-        //             borderRadius:size/2,
-        //             borderWidth:0,
-        //             shadowOpacity:0.5
-        //          }}
-        //          animate={{
-        //             width:size+20,
-        //             height:size+20,
-        //             borderRadius:(size +20)/2,
-        //             borderWidth:size/10,
-        //             shadowOpacity:1
-        //          }}
-        //          transition={{
-        //              type:'timing',
-        //              duration:1000,
-        //              loop:true
-        //          }}
-        //          style={{
-        //              width:size,
-        //                 height:size,
-        //                 borderRadius:size/2,
-        //                 borderWidth:size/2,
-        //                 borderColor:'#fff',
-        //                 shadowOffset:{width:0,height:0},
-        //                 shadowOpacity:1,
-        //                 shadowRadius:10,
-        //          }}
-        //          />
-        //       )
-        //   }
-          const FirstRoute = () => {
-              const scrollY = React.useRef(new Animated.Value(0)).current;
-              return(
-            <>
-            <View style={{flex:1,justifyContent:"flex-start",flexDirection:'column',backgroundColor:"#fff",padding:10}}>
-        {res==false
-        ?
-        <>
-        {console.log('reloadddddd')}
-        {/* // <LoadingIndicator size={100}/> */}
-        <ActivityIndicator  size="small" color="#0000ff" style={{flex:1,justifyContent:"center",alignItems:"center",flexDirection:"row"}}/>
-        </>
-        :
-        <>
-            { transaction.length==0
-            ?<View style={{backgroundColor:"transparent",flex:1,justifyContent:"center",alignItems:"center"}}>
-                <Text style={{fontSize:20,fontWeight:'bold',color:"#2d333a"}}>No Transaction</Text>
-            </View>
-            :<>
-            <Image
-            source={require('../../assets/PNG/Ethereum.png')}
-            style={{height:"100%",width:"100%",position:"absolute",justifyContent:'center',alignItems:"center"}}
-            blurRadius={5}
-            resizeMode="stretch"/>
-
-            <Animated.FlatList
-                data={transaction}
-                // onScroll={Animated.event(
-                //     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-                //     { useNativeDriver: true }
-                // )}
-                // onScrollEndDrag={() => {
-                //     console.log('onScrollEndDrag');
-                // }}
-                renderItem={ ({item,index}) => {
-                    const itemSize =100 +10;
-                    const inputRange = [
-                        -1,
-                        0,
-                        itemSize *index,
-                        itemSize *(index+2),
-                    ];
-                    const opacityInputRange = [
-                        -1,
-                        0,
-                        itemSize *index,
-                        itemSize *(index+0.5),
-                    ];
-                    const scale = scrollY.interpolate({
-                        inputRange:opacityInputRange,
-                        outputRange: [1, 1, 1, 0],
-                    });
-                    const opacity = scrollY.interpolate({
-                        inputRange,
-                        outputRange: [1, 1, 1, 0],
-                    });
-                   return (
-                    <>
-                    {/* {console.log(item.to,address)} */}
-                    {item.to== allAddress[0].address.toLowerCase()
-                    ?<Animated.View style={[style.firstView,
-                        // { opacity,
-                        // transform:[{scale}]
-                        // }
-                        ]} onLayout={(event)=>onLayout(event)}>
-                          <View  style={{width:'100%',height:4,backgroundColor:"lightgreen"}}/>
-                        <View style={style.secondView}>
-                            <View style={style.thirdView}>
-                                <View style={style.fourthView}>
-                                    <Text style={style.text}>Date : {moment.unix(item.timeStamp).format('DD/MM/YYYY')}</Text>
-                                    <Text style={style.text}>Time : {moment.unix(item.timeStamp).format('hh:mm:ss')}</Text>
-                                </View>
-                                <View style={style.fifthView}>
-                                    <View style={style.seventhView}>
-                                        <Text style={[style.text,{textAlign:"center"}]}>{item.value?Number(ethers.utils.formatEther(item.value)).toFixed(4):null}</Text>
-                                        <Text style={[style.text,{textAlign:"center"}]}>ETH</Text>
-                                    </View>
-                                    {/* <Image
-                                        style={{width:30,height:30}}
-                                        source={require('../../assets/PNG/down.png')}
-                                    /> */}
-                                </View>
-                            </View>
-                            <View style={{flexDirection:"row",justifyContent:'space-between',backgroundColor:"transparent",flex:1}}>
-                                <View style={style.fourthView}>
-                                    <Text style={style.text}>From : {item.from.slice(0,8)+'...'}</Text>
-                                    <Text style={style.textLeft}>To : {item.to.slice(0,8)+'...'}</Text>
-                                </View>
-                                <View style={style.eightView}>
-                                    <Text style={style.text}>Sender Address</Text>
-                                    <Image
-                                        style={{width:30,height:30}}
-                                        source={require('../../assets/PNG/copy_white.png')}
-                                    />
-                                </View>
-                            </View>
-                       </View>
-                    </Animated.View>
-                    :<Animated.View style={[style.firstView,{ opacity,
-                        transform:[{scale}]}]} onLayout={(event)=>onLayout(event)}>
-                          <View  style={{width:'100%',height:4,backgroundColor:"red"}}/>
-                        <View style={style.secondView}>
-                            <View style={style.thirdView}>
-                                <View style={style.fourthView}>
-                                    {/* <Text style={style.text}>Hash : {item.hash.slice(0,8)+'...'}</Text> */}
-                                    <Text style={style.text}>Date : {moment.unix(item.timeStamp).format('DD/MM/YYYY')}</Text>
-                                    <Text style={style.text}>Time : {moment.unix(item.timeStamp).format('hh:mm:ss')}</Text>
-                                </View>
-                                <View style={style.fifthView}>
-                                    <View style={style.seventhView}>
-                                        <Text style={[style.text,{textAlign:"center"}]}>{item.value?Number(ethers.utils.formatEther(item.value)).toFixed(4):null}</Text>
-                                        <Text style={[style.text,{textAlign:"center"}]}>ETH</Text>
-                                    </View>
-                                    {/* <Image
-                                        style={{width:30,height:30}}
-                                        source={require('../../assets/PNG/up.png')}
-                                    /> */}
-                                </View>
-                            </View>
-                            <View style={{flexDirection:"row",justifyContent:'space-between',backgroundColor:"transparent",flex:1}}>
-                                <View style={style.fourthView}>
-                                    <Text style={style.text}>From : {item.from.slice(0,8)+'...'}</Text>
-                                        <Text style={style.textLeft}>To : {item.to.slice(0,8)+'...'}</Text>
-                                </View>
-                                <View style={style.eightView}>
-                                <Text style={style.text}>Receiver Address</Text>
-                                        <Image
-                                            style={{width:30,height:30}}
-                                            source={require('../../assets/PNG/copy_white.png')}
-                                        />
-                                </View>
-                            </View>
-                        </View>
-                </Animated.View>
-                    }
-                    </>
-                )}}
-                // ListHeaderComponent={()=>(
-                //     <View style={{height:10,backgroundColor:"transparent"}}/>
-                // )}
-                keyExtractor={item => item.hash}
-                showsVerticalScrollIndicator={false}
-                ItemSeparatorComponent={() => <View style={{height:10,backgroundColor:"transparent"}}/>}
-                ListHeaderComponent={() => <View style={{height:10,backgroundColor:"transparent"}}/>}
-            />
-            </>
-            }
-            </>}
-             </View>
-            </>)
-            }
-          
-          const SecondRoute = () => (
-            res==false
-              ?<ActivityIndicator  size="small" color="#0000ff" style={{flex:1,justifyContent:"center",alignItems:"center",flexDirection:"row"}}/>
-              :
-            <View style={{backgroundColor:"transparent",flex:1,justifyContent:"center",alignItems:"center"}}>
-            <Text style={{fontSize:20,fontWeight:'bold',color:"#2d333a"}}>No Tokens</Text>
-        </View>
-
-            );
+          const FirstRoute = () => <FirstTab res={res} transaction={transaction} allAddress={allAddress}/>
            
-          const ThirdRoute = gestureHandlerRootHOC(() => {
-              return(
-                res==false
-                ?<ActivityIndicator  size="small" color="#0000ff" style={{flex:1,justifyContent:"center",alignItems:"center",flexDirection:"row"}}/>:
-                <View style={{ paddingHorizontal: 10 }}>
-                    <View style={style.filtersContainer}>
-                        {filterDaysArray.map((day) => (
-                            <FilterComponent
-                            filterDay={day.filterDay}
-                            filterText={day.filterText}
-                            selectedRange={selectedRange}
-                            setSelectedRange={memoOnSelectedRangeChange}
-                            key={day.filterText}
-                            />
-                        ))}
-                    </View>
-                    <View style={{ flexDirection: "row" }}>
-          <View style={{ flexDirection: "row", flex: 1 }}>
-            <Text style={{ color: "#000", alignSelf: "center" }}>
-              {symbol.toUpperCase()}
-            </Text>
-            <TextInput
-              style={style.input}
-              value={coinValue}
-              keyboardType="numeric"
-              onChangeText={number =>changeCoinValue(number)}
-            />
-          </View>
-          <View style={{ flexDirection: "row", flex: 1 }}>
-            <Text style={{ color: "#000", alignSelf: "center" }}>USD</Text>
-            <TextInput
-              style={style.input}
-              value={usdValue}
-              keyboardType="numeric"
-              onChangeText={number =>changeUsdValue(number)}
-            />
-          </View>
-        </View>
-                    <LineChart.Provider data={prices.map(([timestamp, value]) => ({ timestamp, value }))}>
-                        <LineChart height={screenWidth / 2} width={screenWidth}>
-                            <LineChart.Path color='blue'>
-                            <LineChart.Gradient color="blue" />
-                            <LineChart.HorizontalLine at={{ value: 3027.84 }} />
-                            </LineChart.Path>
-                            <LineChart.CursorCrosshair >
-                    <LineChart.Tooltip />
-                    </LineChart.CursorCrosshair>
-                        </LineChart>
-                        <LineChart.PriceText />
-                        <LineChart.DatetimeText />
-                    </LineChart.Provider>
-                    {/* <CandlestickChart.Provider
-            data={coinCandleChartData.map(
-              ([timestamp, open, high, low, close]) => ({
-                timestamp,
-                open,
-                high,
-                low,
-                close,
-              })
-            )}
-          >
-            <CandlestickChart height={screenWidth / 2} width={screenWidth}>
-              <CandlestickChart.Candles />
-              <CandlestickChart.Crosshair>
-                <CandlestickChart.Tooltip />
-              </CandlestickChart.Crosshair>
-            </CandlestickChart>
-            <View style={style.candleStickDataContainer}>
-              <View style={{flexDirection:"column",justifyContent:"space-evenly",alignItems:"center"}}>
-                <Text style={style.candleStickTextLabel}>Open</Text>
-                <CandlestickChart.PriceText
-                  style={style.candleStickText}
-                  type="open"
-                />
-              </View>
-              <View>
-                <Text style={style.candleStickTextLabel}>High</Text>
-                <CandlestickChart.PriceText
-                  style={style.candleStickText}
-                  type="high"
-                />
-              </View>
-              <View>
-                <Text style={style.candleStickTextLabel}>Low</Text>
-                <CandlestickChart.PriceText
-                  style={style.candleStickText}
-                  type="low"
-                />
-              </View>
-              <View>
-                <Text style={style.candleStickTextLabel}>Close</Text>
-                <CandlestickChart.PriceText
-                  style={style.candleStickText}
-                  type="close"
-                />
-              </View>
-            </View>
-            <CandlestickChart.DatetimeText
-              style={{ color: "white", fontWeight: "700", margin: 10 }}
-            />
-          </CandlestickChart.Provider> */}
-
-       
-                </View>
-            )});
+          const SecondRoute = () =><SecondTab res={res} />
+           
+          const ThirdRoute = gestureHandlerRootHOC(() => <ThirdTab res={res} prices={prices}/>)
           
           const renderScene = SceneMap({
             first: FirstRoute,
@@ -594,13 +283,13 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
                 source={require('../../assets/PNG/Ethereum.png')}/>
                 :<Image
                 style={{width: 20, height: 20,opacity:focused?1:0.5}}
-                source={require('../../assets/PNG/chart.png')}/>
+                source={require('../../assets/PNG/linechart.png')}/>
             );
         };
           const renderTabBar = (props) => {
             return (
                 <>
-                <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"center",backgroundColor:"transparent"}}>
+                <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"center",backgroundColor:"#fff"}}>
                 <Text style={{paddingLeft:10,fontWeight:"bold",fontSize:20,color:"#2d333a"}}>{routes[index].title}</Text>
                 <TouchableOpacity style={{marginRight:"auto",marginLeft:10}} onPress={()=>relodeData()}>
                   <Image
@@ -650,8 +339,11 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
                     }}
                 />
                 <View>
+                  <View style={{flexDirection:"row"}}>
                     <Text style={{color:"#2d333a",fontSize:20,fontWeight:'bold'}}>{symbol.toUpperCase()}</Text>
-                    <Text style={{color:"#2d333a",fontSize:20,fontWeight:'bold'}}>${usdValue}</Text>
+                    <Text style={{color:price_change_percentage_24h<0?'#ea3943':'#16c784',fontSize:20,fontWeight:'bold',marginLeft:10}}>{price_change_percentage_24h?.toFixed(2)}%</Text>
+                    </View>
+                    <Text style={{color:"#2d333a",fontSize:20,fontWeight:'bold'}}>${current_price.usd}</Text>
                 </View>
             </View>
 
@@ -664,7 +356,7 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
           </TouchableOpacity>
 
         </View>
-    <View style={{height:"35%",width:"100%",backgroundColor:"#fff",padding:15,flexDirection:'row',justifyContent:"flex-start"}}>
+    <View style={{height:"30%",width:"100%",backgroundColor:"#2B2B2B",padding:15,flexDirection:'row',justifyContent:"flex-start"}}>
         {sideview==true
         ?<MainInfo address={allAddress[0].address} navigation={navigation} name={allAddress[0].name}/>
         :<MainInfoLeft address={allAddress[0].address} navigation={navigation} name={allAddress[0].name}/>
@@ -861,11 +553,14 @@ const style = StyleSheet.create({
       filtersContainer: {
         flexDirection: "row",
         justifyContent: "space-around",
-        backgroundColor: "#2B2B2B",
+        backgroundColor: "#fff",
         paddingVertical: 5,
         borderRadius: 5,
         marginVertical: 10,
-        marginBottom: 20
+        marginBottom: 20,
+        width:"95%",
+        position:"absolute",
+        top:20
       },
       candleStickText: {
         color: "white",
