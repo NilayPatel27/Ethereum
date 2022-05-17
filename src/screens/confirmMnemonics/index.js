@@ -48,20 +48,20 @@ const setItem = async() =>{
     // }
     _storeData();
     // navigation.dispatch(resetAction);
-    // const wallet = loadWalletFromMnemonics(mnemonic);
-    // console.log(wallet.privateKey);
-    // let obj = {
-    //   name: converter.toWordsOrdinal(address.length),
-    //   address: wallet.address,
-    //   wallet: wallet,
-    //   privateKey: wallet.privateKey,
-    // }
-    // for (let i = 0; i < address.length; i++) {
-    //   if (address[i].address === wallet.address) {
-    //     return;
-    //   }
-    // }
-    // dispatch(addressArray(obj));
+    const wallet = loadWalletFromMnemonics(mnemonic);
+    console.log(wallet.privateKey);
+    let obj = {
+      name: converter.toWordsOrdinal(address.length),
+      address: wallet.address,
+      wallet: wallet,
+      privateKey: wallet.privateKey,
+    }
+    for (let i = 0; i < address.length; i++) {
+      if (address[i].address === wallet.address) {
+        return;
+      }
+    }
+    dispatch(addressArray(obj));
     navigation.reset({
       index: 0,
       routes: [{ name: 'HomePage' }],

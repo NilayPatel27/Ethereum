@@ -19,7 +19,7 @@ const MainInfo = gestureHandlerRootHOC(({address,navigation,name}) => {
   const reactiveAnimated = useRef(new Animated.Value(0)).current;
 
     const [balances, setbalances] = useState(null);
-    const [data, setData] = useState([]);
+    // const [data, setData] = useState([]);
     const [res, setres] = useState(false)
     const [count, setcount] = useState(false);
   let allAddress = useSelector(selectAddress);
@@ -70,11 +70,11 @@ const MainInfo = gestureHandlerRootHOC(({address,navigation,name}) => {
           setbalances(res.data.result);
 
       });
-      for(let i=0;i<allAddress.length;i++){
-        if(allAddress[i].address===address){
-          setData(allAddress[i]);
-        }
-      }
+      // for(let i=0;i<allAddress.length;i++){
+      //   if(allAddress[i].address===address){
+      //     setData(allAddress[i]);
+      //   }
+      // }
       setres(true)
     }, [])
     const copyToClipboard =(index)=>{
@@ -112,6 +112,7 @@ const MainInfo = gestureHandlerRootHOC(({address,navigation,name}) => {
     }
   return (
     <>
+    <View style={{flex:1,backgroundColor:"#2B2B2B"}}>
     <FlingGestureHandler key='UP' direction={Directions.UP} onHandlerStateChange={(ev)=>{
       if (ev.nativeEvent.state === State.END) 
       {
@@ -135,6 +136,7 @@ const MainInfo = gestureHandlerRootHOC(({address,navigation,name}) => {
             {/* <View style={{flex:1,justifyContent:'center',alignItems:"center"}}> */}
             <FlatList
               data={allAddress}
+              inverted
               keyExtractor={(item, index) => index}
               scrollEnabled={false}
               contentContainerStyle={{
@@ -176,7 +178,7 @@ const MainInfo = gestureHandlerRootHOC(({address,navigation,name}) => {
         
         <Animated.View style={{
           position:'absolute',
-          opacity:1,
+          opacity,
           transform:[{translateY},{scale}],
           alignSelf:'center',
           justifyContent:"center",
@@ -199,10 +201,10 @@ const MainInfo = gestureHandlerRootHOC(({address,navigation,name}) => {
                   <Text style={style.orange}>:</Text>
               </View>
               <View style={{height:"100%",flex:1,backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"flex-start"}}>
-                  <Text style={{fontSize:15,fontWeight:'bold',alignItems:"center",color:'#fff'}}>{data.name}</Text>
-                  <Text style={{fontSize:15,fontWeight:'bold',color:'#fff'}}>{data.address.slice(0, 5)+'...'+data.address.slice(
-                              data.address.length - 4,
-                              data.address.length,
+                  <Text style={{fontSize:15,fontWeight:'bold',alignItems:"center",color:'#fff'}}>{item.name}</Text>
+                  <Text style={{fontSize:15,fontWeight:'bold',color:'#fff'}}>{item.address.slice(0, 5)+'...'+item.address.slice(
+                              item.address.length - 4,
+                              item.address.length,
                               )}</Text>
                   <Text style={{fontSize:15,fontWeight:'bold',color:'#fff'}}>{balances?Number(ethers.utils.formatEther(balances)).toFixed(4):null} ETH</Text>
                   <Text style={{fontSize:15,fontWeight:'bold',color:'#fff'}}>${balances?(USD*(ethers.utils.formatEther(balances))).toFixed(2):null}</Text>
@@ -263,6 +265,7 @@ const MainInfo = gestureHandlerRootHOC(({address,navigation,name}) => {
             </View>
         </View>
   </Modal>
+  </View>
   </>
   )
 })

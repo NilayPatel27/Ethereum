@@ -15,7 +15,7 @@ const FilterComponent = (props) => {
       }}
       onPress={() => setSelectedRange(filterDay)}
     >
-      <Text style={{ color: isFilterSelected(filterDay) ? "white" : "grey" }}>{filterText}</Text>
+      <Text style={{ color: isFilterSelected(filterDay) ? "white" : "white" }}>{filterText}</Text>
     </Pressable>
   );
 };
