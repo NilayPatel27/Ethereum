@@ -1,4 +1,4 @@
-import { View, Text, ImageBackground, StyleSheet, StatusBar } from 'react-native'
+import { View, Text, ImageBackground, StyleSheet, StatusBar, Image } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import * as Animatable from 'react-native-animatable';
 
@@ -13,30 +13,30 @@ const NewSplash = ({ navigation, route }) => {
         backgroundColor={'transparent'}
         barStyle="light-content"
       />
-      <ImageBackground source={require('../assets/PNG/Splash.png')} style={{ flex: 1 }}>
+      <ImageBackground source={require('../assets/PNG/Wallpaper.jpg')} style={{ flex: 1 }} resizeMode="cover" >
         <Animatable.View animation="zoomIn" style={styles.openPosition}>
-          <Text style={styles.companyName1}>Market</Text>
-
-          <Text style={styles.companyName2}>Trade</Text>
+          <Image 
+          source={require('../assets/PNG/Ethereum.png')}
+          style={{height:200,width:200}}
+          />
+          <Text style={styles.companyName1}>Ethereum</Text>
         </Animatable.View>
       </ImageBackground>
     </View>
   )
 }
 
-export default NewSplash
+export default NewSplash;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   openPosition: {
-    flexDirection: 'column',
-    margin: 50,
-    top: '35%',
-
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
+    flex:1,
+    justifyContent:'center',
+    alignItems:"center",
+    color:"#2d333a"
   },
 
   companyName1: {

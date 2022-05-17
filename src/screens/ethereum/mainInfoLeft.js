@@ -135,7 +135,7 @@ const MainInfo = gestureHandlerRootHOC(({address,navigation,name}) => {
             {/* <View style={{flex:1,justifyContent:'center',alignItems:"center"}}> */}
             <FlatList
               data={allAddress}
-              keyExtractor={(item, index) => index}
+              keyExtractor={(item, index) => index.toString()}
               scrollEnabled={false}
               contentContainerStyle={{
                 flex: 1,
@@ -158,7 +158,7 @@ const MainInfo = gestureHandlerRootHOC(({address,navigation,name}) => {
           )}}
 
     renderItem={({ item, index }) => {
-      const inputRange = [index-1,index,index+1]
+      const inputRange =[index-1,index,index+1]
       const translateY = animatedValue.interpolate({
         inputRange,
         outputRange :[-30,0,30]
@@ -183,51 +183,47 @@ const MainInfo = gestureHandlerRootHOC(({address,navigation,name}) => {
           flexDirection:"row",
           top:-50,
           height:150,
+        //   zIndex:allAddress-index,
+          // width:width
         }} >
-        <View style={{flexDirection:"row",justifyContent:"space-between",width:'95%'}}  >
-          <View style={{width:"70%",height:"100%",backgroundColor:"#002147",flexDirection:'row',justifyContent:'flex-start',alignItems:"center",borderTopLeftRadius:10,borderBottomLeftRadius:10}}>
-              <View style={{width:'30%',height:"100%",backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"flex-end"}}>
-                  <Text style={style.orange}>Name</Text>
-                  <Text style={style.orange}>Address</Text>
-                  <Text style={style.orange}>Balance</Text>
-                  <Text style={style.orange}>Dollar</Text>
-              </View>
-              <View style={{width:"5%",height:"100%",backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"center"}}>
-                  <Text style={style.orange}>:</Text>
-                  <Text style={style.orange}>:</Text>
-                  <Text style={style.orange}>:</Text>
-                  <Text style={style.orange}>:</Text>
-              </View>
-              <View style={{height:"100%",flex:1,backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"flex-start"}}>
-                  <Text style={{fontSize:15,fontWeight:'bold',alignItems:"center",color:'#fff'}}>{data.name}</Text>
-                  <Text style={{fontSize:15,fontWeight:'bold',color:'#fff'}}>{data.address.slice(0, 5)+'...'+data.address.slice(
-                              data.address.length - 4,
-                              data.address.length,
-                              )}</Text>
-                  <Text style={{fontSize:15,fontWeight:'bold',color:'#fff'}}>{balances?Number(ethers.utils.formatEther(balances)).toFixed(4):null} ETH</Text>
-                  <Text style={{fontSize:15,fontWeight:'bold',color:'#fff'}}>${balances?(USD*(ethers.utils.formatEther(balances))).toFixed(2):null}</Text>
-              </View>
-          </View>
-          <View style={{flexDirection:"column",justifyContent:'space-evenly',flex:1,alignItems:'center',backgroundColor:"lightblue",borderTopRightRadius:10,borderBottomRightRadius:10}}>
-                  <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>navigation.navigate('BuyEther')}>
-                  <Image
-                      style={{width: 25, height: 25}}
-                      source={require('../../assets/PNG/Ethereum.png')}/> 
-                      <Text style={{color:"#2d333a"}}>Buy</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>setcount(true)}>
-                  <Image
-                      style={{width: 25, height: 25}}
-                      source={require('../../assets/PNG/Receive.png')}/> 
-                      <Text style={{color:"#2d333a"}}>Receive</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>navigation.navigate('SendEther',{address:address,name:name})}>
-                  <Image
-                      style={{width: 25, height: 25}}
-                      source={require('../../assets/PNG/Send.png')}/>
-                      <Text style={{color:"#2d333a"}}>Send</Text>
-                  </TouchableOpacity>
-          </View>
+         <View style={{flexDirection:"row",justifyContent:"space-between",width:'95%'}} >
+            <View style={{flexDirection:"column",justifyContent:'space-evenly',flex:1,alignItems:'center',backgroundColor:"lightblue",borderTopLeftRadius:10,borderBottomLeftRadius:10}}>
+                    <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>navigation.navigate('BuyEther')}>
+                        <Image style={{width: 25, height: 25}} source={require('../../assets/PNG/Ethereum.png')}/> 
+                        <Text style={{color:"#2d333a"}}>Buy</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>setcount(true)}>
+                        <Image style={{width: 25, height: 25}} source={require('../../assets/PNG/Receive.png')}/> 
+                        <Text style={{color:"#2d333a"}}>Receive</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>navigation.navigate('SendEther',{address:address,name:name})}>
+                        <Image style={{width: 25, height: 25}} source={require('../../assets/PNG/Send.png')}/>
+                        <Text style={{color:"#2d333a"}}>Send</Text>
+                    </TouchableOpacity>
+            </View>
+            <View style={{width:"70%",height:"100%",backgroundColor:"#002147",flexDirection:'row',justifyContent:'flex-start',alignItems:"center",borderTopRightRadius:10,borderBottomRightRadius:10}}>
+                <View style={{height:"100%",flex:1,backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"flex-end"}}>
+                    <Text style={{fontSize:15,fontWeight:'bold',color:"#fff"}}>{name}</Text>
+                    <Text style={{fontSize:15,fontWeight:'bold',color:"#fff"}}>{address.slice(0, 5)+'...'+address.slice(
+                                address.length - 4,
+                                address.length,
+                                )}</Text>
+                    <Text style={{fontSize:15,fontWeight:'bold',color:"#fff"}}>{balances?Number(ethers.utils.formatEther(balances)).toFixed(4):null} ETH</Text>
+                    <Text style={{fontSize:15,fontWeight:'bold',color:"#fff"}}>${balances?(USD*(ethers.utils.formatEther(balances))).toFixed(2):null}</Text>
+                </View>
+                <View style={{width:"5%",height:"100%",backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"center"}}>
+                    <Text style={style.orange}>:</Text>
+                    <Text style={style.orange}>:</Text>
+                    <Text style={style.orange}>:</Text>
+                    <Text style={style.orange}>:</Text>
+                </View>
+                <View style={{width:'30%',height:"100%",backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"flex-start"}}>
+                    <Text style={style.orange}>Name</Text>
+                    <Text style={style.orange}>Address</Text>
+                    <Text style={style.orange}>Balance</Text>
+                    <Text style={style.orange}>Dollar</Text>
+                </View>
+            </View>
         </View>
     </Animated.View>
       )}}

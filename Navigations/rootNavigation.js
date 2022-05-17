@@ -9,7 +9,7 @@ import ConfirmBox from '../src/screens/confirmMnemonics/ConfirmBox';
 import HomePage from '../src/screens/homePage';
 import Ethereum from '../src/screens/ethereum';
 import ImportAccount from '../src/screens/importAccount';
-import WalletPage from '../src/screens/ethereum/walletPage';
+import WalletPage from '../src/screens/ethereum/accounts';
 import { useDispatch } from 'react-redux';
 import { view } from '../counterSlice';
 import BuyEther from '../src/screens/buyEther';
@@ -21,6 +21,14 @@ const Stack = createNativeStackNavigator();
 
 const screenOptions = {
   headerShown: true,
+  headerTintColor: "#fff",
+  headerStyle: {
+    backgroundColor: '#2c2e3b',
+  },
+  headerTitleStyle: {
+    color: 'white',
+    fontSize: 30,
+  }
 };
 const rootNavigation = ({ loginValue }) => {
   const [isEnabled, setIsEnabled] = useState(false);
@@ -51,24 +59,10 @@ const rootNavigation = ({ loginValue }) => {
         <Stack.Screen name="ConfirmBox" component={ConfirmBox} />
         <Stack.Screen name="AmountPage" component={AmountPage} />
         <Stack.Screen name="CofirmTransaction" component={CofirmTransaction} />
-        <Stack.Screen name="HomePage" options={({ navigation }) => ({
-          headerTitle: 'HomePage',
-          headerRight: () => (
-            <>
-              <Switch
-                trackColor={{ false: "#767577", true: "#81b0ff" }}
-                thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
-                ios_backgroundColor="#3e3e3e"
-                onValueChange={toggleSwitch}
-                value={isEnabled}
-              />
-            </>
-          )
-        }
-        )} component={HomePage} />
+        <Stack.Screen name="HomePage" component={HomePage} />
         <Stack.Screen name="Accounts" component={Ethereum} />
         <Stack.Screen name="ImportAccount" component={ImportAccount} />
-        <Stack.Screen name="WalletPage" component={WalletPage} />
+        <Stack.Screen name="WalletPage" component={WalletPage} options={{headerShown:false}} />
       </Stack.Navigator>
     </NavigationContainer >
   );
