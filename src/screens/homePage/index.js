@@ -113,27 +113,42 @@ const HomePage = ({ navigation }) => {
 
   const Header = () => {
     return (
-      <View style={{ height: 200, backgroundColor: '#2c2e3b', justifyContent: 'center' }} >
-        <View style={{ margin: 15, backgroundColor: 'rgba(52, 52, 52, 0.8)', height: 160, borderRadius: 10, justifyContent: "center", paddingLeft: 15 }}>
-          <View>
-            <Text style={{ fontSize: 20, color: '#fff', marginLeft: 5 }}>Total Amount</Text>
-            <Text style={{ fontSize: 15, color: '#969aa0', marginLeft: 5 }}>0 Account / 0 Cryptos</Text>
-            <TouchableOpacity onPress={() => setInfo(!info)} style={{ position: 'absolute', right: 135, top: 25 }}>
-              {info === true ?
-                <HideInfo height={25} width={25} /> : <ShowInfo height={25} width={25} />}
-            </TouchableOpacity>
+      <>
+        <View style={{ height: 140, backgroundColor: '#2c2e3b', }} >
+          <View style={{ margin: 15, backgroundColor: '#DCDCDC', height: 110, borderRadius: 10, }}>
+            <View style={{ backgroundColor: 'rgba(52, 52, 52, 0.9)', borderTopStartRadius: 10, borderTopEndRadius: 10, justifyContent: 'space-between', flexDirection: 'row', height: 50, alignItems: 'center' }}>
+              <View>
+                <Text style={{ fontSize: 20, color: '#fff', marginLeft: 15 }}>Total Amount</Text>
+              </View>
+              <View style={{ marginRight: 15 }}>
+                <TouchableOpacity onPress={() => setInfo(!info)}>
+                  {info === true ?
+                    <HideInfo height={25} width={25} /> : <ShowInfo height={25} width={25} />}
+                </TouchableOpacity>
+              </View>
 
-            {/* <SvgUri
-            width="20"
-            height="20"
-            uri={ShowInfo}
-            fill="white"
-          /> */}
-            {info === true ?
-              <Text style={{ fontSize: 40, color: '#fff', marginLeft: 5 }}>$0.00</Text> : <Text style={{ fontSize: 40, color: '#fff', marginLeft: 5 }}>********</Text>}
+            </View >
+            <View style={{ justifyContent: 'space-between', flexDirection: 'row', alignItems: 'baseline' }}>
+              {info === true ?
+                <Text style={{ fontSize: 40, color: '#2c2e3b', marginLeft: 15 }}>$0.00</Text> : <Text style={{ fontSize: 40, color: '#2c2e3b', marginLeft: 15 }}>*****</Text>}
+
+
+
+              <View style={{ marginRight: 15 }}><Text style={{ fontSize: 15, color: '#2c2e3b', marginLeft: 15 }}>0 Account / 0 Cryptos</Text></View>
+
+            </View>
           </View>
         </View>
-      </View>
+        <View>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={{ fontSize: 20, color: '#fff', marginLeft: 15 }}>Market</Text>
+
+            </View>
+          </View>
+        </View>
+      </>
+
     )
   }
 

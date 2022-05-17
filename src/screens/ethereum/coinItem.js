@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, Image, Pressable, StyleSheet } from "react-native";
+import { Text, View, Image, Pressable, StyleSheet, ImageBackground, ViewPropTypes } from "react-native";
 // import { AntDesign } from "@expo/vector-icons";
 // import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { selectAddress } from "../../../counterSlice";
 import axios from "axios";
+import { transform } from "lodash";
 
 const CoinItem = ({ marketCoin, balance, navigation, info }) => {
 
@@ -53,16 +54,39 @@ const CoinItem = ({ marketCoin, balance, navigation, info }) => {
                 style={styles.coinContainer}
                 onPress={() => navigation.navigate("Accounts")}
             >
-                <Image
-                    source={{ uri: image }}
-                    style={{
-                        height: 40,
-                        width: 40,
-                        marginRight: 10,
-                        alignSelf: "center",
-                    }}
-                />
-                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", flex: 1 }}>
+
+                {/* <Image style={{ height: 70, width: 70, borderRadius: 50 }} source={{ uri: image }} blurRadius={100}>
+                    <View style={styles.overlay}>
+                        <Image
+                            source={{ uri: image }}
+
+                            style={{
+                                height: 40,
+                                width: 40,
+                                // marginRight: 10,
+                                alignSelf: "center",
+                            }}
+                        />
+                    </View>
+                </Image> */}
+                <View style={{ height: 60, width: 60, alignItems: "center", justifyContent: "center" }}>
+                    <Image style={{ height: 60, width: 60, borderRadius: 50 }} source={{ uri: image }} blurRadius={100}>
+                    </Image>
+                    <Image
+                        source={{ uri: image }}
+
+                        style={{
+                            height: 40,
+                            width: 40,
+                            position: 'absolute',
+                            // marginRight: 10,
+                        }}
+                    />
+                </View>
+
+
+
+                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", flex: 1, marginLeft: 10 }}>
                     <View>
                         <Text style={styles.title}>{symbol.toUpperCase()}</Text>
                         <View style={{ flexDirection: "row" }}>
@@ -76,19 +100,23 @@ const CoinItem = ({ marketCoin, balance, navigation, info }) => {
             color={percentageColor}
             style={{ alignSelf: "center", marginRight: 5 }}
           /> */}
+                            <View style={{ alignItems: "center" }}>
 
-                            <Text style={{ color: percentageColor }}>
-                                {price_change_percentage_24h?.toFixed(2)}%
-                            </Text>
+                                <Text style={{ color: "#969aa0" }}>
+                                    MCap {normalizeMarketCap(market_cap)}
+                                </Text>
+                            </View>
                         </View>
                     </View>
 
                     <View style={{ alignItems: "center" }}>
                         <Text style={styles.title}>${current_price}</Text>
-                        <Text style={{ color: "#969aa0" }}>
-                            MCap {normalizeMarketCap(market_cap)}
+                        <Text style={{ color: percentageColor }}>
+                            {price_change_percentage_24h?.toFixed(2)}%
                         </Text>
+
                     </View>
+
                     {info === true ?
                         <View style={{ alignItems: "center" }}>
                             <Text style={styles.title}>0.00</Text>
@@ -106,6 +134,12 @@ const CoinItem = ({ marketCoin, balance, navigation, info }) => {
 
 export default CoinItem;
 const styles = StyleSheet.create({
+    overlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.2)',
+        alignItems: "center",
+        justifyContent: "center",
+    },
     title: {
         color: "#fff",
         fontSize: 16,
