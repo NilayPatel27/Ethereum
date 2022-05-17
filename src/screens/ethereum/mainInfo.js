@@ -3,12 +3,21 @@ import { ethers } from 'ethers';
 import Modal from 'react-native-modal';
 import { useSelector } from 'react-redux';
 import QRCode from 'react-native-qrcode-svg';
-import React, { useState, useEffect, useRef } from 'react';
 import { selectAddress } from '../../../counterSlice';
 import Clipboard from '@react-native-community/clipboard';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Animated, PanResponder, TouchableWithoutFeedback, Share, ToastAndroid } from 'react-native';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Directions, FlingGestureHandler, gestureHandlerRootHOC, State } from 'react-native-gesture-handler';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Animated, PanResponder, TouchableWithoutFeedback, Share, ToastAndroid, Dimensions, FlatList } from 'react-native';
 
-const MainInfo = ({ address, navigation, name }) => {
+const width = Dimensions.get('window').width;
+const imageWidth = width * 0.86;
+const imageHeight = imageWidth * 1.5;
+const visibleItems = 4;
+const MainInfo = gestureHandlerRootHOC(({ address, navigation, name }) => {
+    const [activeIndex, setactiveIndex] = useState(0);
+    const animatedValue = useRef(new Animated.Value(0)).current;
+    const reactiveAnimated = useRef(new Animated.Value(0)).current;
+
     const [balances, setbalances] = useState(null);
     const [data, setData] = useState([]);
     const [res, setres] = useState(false)
@@ -51,6 +60,11 @@ const MainInfo = ({ address, navigation, name }) => {
         })
     ).current;
     useEffect(() => {
+        Animated.timing(animatedValue, {
+            toValue: reactiveAnimated,
+            duration: 300,
+            useNativeDriver: true
+        }).start()
         axios.get(`https://api-ropsten.etherscan.io/api?module=account&action=balance&address=${address}&apikey=349IQMJ71CEBWJ65I1U5G5N5NG43C37UZB&tag=latest`).then(res => {
             // console.log(res.data.result)
             setbalances(res.data.result);
@@ -72,6 +86,11 @@ const MainInfo = ({ address, navigation, name }) => {
             message: address,
         });
     }
+    const setActiveSlide = useCallback(newIndex => {
+        setactiveIndex(newIndex);
+        reactiveAnimated.setValue(newIndex);
+    }
+    )
     const renderColumn = (icon, label, action) => (
         <TouchableWithoutFeedback onPress={action}>
             <View style={style.actionColumn}>
@@ -93,51 +112,128 @@ const MainInfo = ({ address, navigation, name }) => {
     }
     return (
         <>
-            <Animated.View style={{ transform: [{ translateY: pan.y }], flexDirection: "row", justifyContent: "space-between", flex: 1 }} {...panResponder.panHandlers} >
-                <View style={{ width: "70%", height: "100%", backgroundColor: "#002147", flexDirection: 'row', justifyContent: 'flex-start', alignItems: "center", borderTopLeftRadius: 10, borderBottomLeftRadius: 10 }}>
-                    <View style={{ width: '30%', height: "100%", backgroundColor: 'transparent', flexDirection: "column", justifyContent: "space-evenly", alignItems: "flex-end" }}>
-                        <Text style={style.orange}>Name</Text>
-                        <Text style={style.orange}>Address</Text>
-                        <Text style={style.orange}>Balance</Text>
-                        <Text style={style.orange}>Dollar</Text>
-                    </View>
-                    <View style={{ width: "5%", height: "100%", backgroundColor: 'transparent', flexDirection: "column", justifyContent: "space-evenly", alignItems: "center" }}>
-                        <Text style={style.orange}>:</Text>
-                        <Text style={style.orange}>:</Text>
-                        <Text style={style.orange}>:</Text>
-                        <Text style={style.orange}>:</Text>
-                    </View>
-                    <View style={{ height: "100%", flex: 1, backgroundColor: 'transparent', flexDirection: "column", justifyContent: "space-evenly", alignItems: "flex-start" }}>
-                        <Text style={{ fontSize: 15, fontWeight: 'bold', alignItems: "center", color: '#fff' }}>{data.name}</Text>
-                        <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#fff' }}>{data.address.slice(0, 5) + '...' + data.address.slice(
-                            data.address.length - 4,
-                            data.address.length,
-                        )}</Text>
-                        <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#fff' }}>{balances ? Number(ethers.utils.formatEther(balances)).toFixed(4) : null} ETH</Text>
-                        <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#fff' }}>${balances ? (USD * (ethers.utils.formatEther(balances))).toFixed(2) : null}</Text>
-                    </View>
-                </View>
-                <View style={{ flexDirection: "column", justifyContent: 'space-evenly', flex: 1, alignItems: 'center', backgroundColor: "lightblue", borderTopRightRadius: 10, borderBottomRightRadius: 10 }}>
-                    <TouchableOpacity style={{ justifyContent: "center", alignItems: 'center', flexDirection: "column" }} onPress={() => navigation.navigate('BuyEther')}>
-                        <Image
-                            style={{ width: 25, height: 25 }}
-                            source={require('../../assets/PNG/Ethereum.png')} />
-                        <Text style={{ color: "#2d333a" }}>Buy</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{ justifyContent: "center", alignItems: 'center', flexDirection: "column" }} onPress={() => setcount(true)}>
-                        <Image
-                            style={{ width: 25, height: 25 }}
-                            source={require('../../assets/PNG/Receive.png')} />
-                        <Text style={{ color: "#2d333a" }}>Receive</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{ justifyContent: "center", alignItems: 'center', flexDirection: "column" }} onPress={() => navigation.navigate('SendEther', { address: address, name: name })}>
-                        <Image
-                            style={{ width: 25, height: 25 }}
-                            source={require('../../assets/PNG/Send.png')} />
-                        <Text style={{ color: "#2d333a" }}>Send</Text>
-                    </TouchableOpacity>
-                </View>
-            </Animated.View>
+            <FlingGestureHandler key='UP' direction={Directions.UP} onHandlerStateChange={(ev) => {
+                if (ev.nativeEvent.state === State.END) {
+                    if (activeIndex === allAddress.length - 1)
+                        return;
+                    setActiveSlide(activeIndex + 1)
+                }
+            }
+            }>
+                <FlingGestureHandler key='DOWN'
+                    direction={Directions.DOWN}
+                    onHandlerStateChange={ev => {
+                        console.log('down')
+                        if (ev.nativeEvent.state === State.END) {
+                            if (activeIndex === 0)
+                                return;
+                            setActiveSlide(activeIndex - 1)
+                        }
+                    }}>
+                    {/* <View style={{flex:1,justifyContent:'center',alignItems:"center"}}> */}
+                    <FlatList
+                        data={allAddress}
+                        keyExtractor={(item, index) => index}
+                        scrollEnabled={false}
+                        contentContainerStyle={{
+                            flex: 1,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
+                        CellRendererComponent={({ item, index, children, style, ...props }) => {
+                            const newStyle = [
+                                style,
+                                {
+                                    zIndex: allAddress.length - index,
+                                    // left : -imageWidth/2,
+                                    // top : -imageHeight/2,
+                                }
+                            ]
+                            return (
+                                <View index={index} {...props} style={newStyle}>
+                                    {children}
+                                </View>
+                            )
+                        }}
+
+                        renderItem={({ item, index }) => {
+                            const inputRange = [index - 1, index, index + 1]
+                            const translateY = animatedValue.interpolate({
+                                inputRange,
+                                outputRange: [-30, 0, 30]
+                            });
+
+                            const opacity = animatedValue.interpolate({
+                                inputRange,
+                                outputRange: [1 - 1 / visibleItems, 1, 0]
+                            });
+                            const scale = animatedValue.interpolate({
+                                inputRange,
+                                outputRange: [0.92, 1, 1.2],
+                            });
+                            return (
+
+                                <Animated.View style={{
+                                    position: 'absolute',
+                                    opacity: 1,
+                                    transform: [{ translateY }, { scale }],
+                                    alignSelf: 'center',
+                                    justifyContent: "center",
+                                    flexDirection: "row",
+                                    top: -50,
+                                    height: 150,
+                                }} >
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", width: '95%' }}  >
+                                        <View style={{ width: "70%", height: "100%", backgroundColor: "#002147", flexDirection: 'row', justifyContent: 'flex-start', alignItems: "center", borderTopLeftRadius: 10, borderBottomLeftRadius: 10 }}>
+                                            <View style={{ width: '30%', height: "100%", backgroundColor: 'transparent', flexDirection: "column", justifyContent: "space-evenly", alignItems: "flex-end" }}>
+                                                <Text style={style.orange}>Name</Text>
+                                                <Text style={style.orange}>Address</Text>
+                                                <Text style={style.orange}>Balance</Text>
+                                                <Text style={style.orange}>Dollar</Text>
+                                            </View>
+                                            <View style={{ width: "5%", height: "100%", backgroundColor: 'transparent', flexDirection: "column", justifyContent: "space-evenly", alignItems: "center" }}>
+                                                <Text style={style.orange}>:</Text>
+                                                <Text style={style.orange}>:</Text>
+                                                <Text style={style.orange}>:</Text>
+                                                <Text style={style.orange}>:</Text>
+                                            </View>
+                                            <View style={{ height: "100%", flex: 1, backgroundColor: 'transparent', flexDirection: "column", justifyContent: "space-evenly", alignItems: "flex-start" }}>
+                                                <Text style={{ fontSize: 15, fontWeight: 'bold', alignItems: "center", color: '#fff' }}>{data.name}</Text>
+                                                <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#fff' }}>{data.address.slice(0, 5) + '...' + data.address.slice(
+                                                    data.address.length - 4,
+                                                    data.address.length,
+                                                )}</Text>
+                                                <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#fff' }}>{balances ? Number(ethers.utils.formatEther(balances)).toFixed(4) : null} ETH</Text>
+                                                <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#fff' }}>${balances ? (USD * (ethers.utils.formatEther(balances))).toFixed(2) : null}</Text>
+                                            </View>
+                                        </View>
+                                        <View style={{ flexDirection: "column", justifyContent: 'space-evenly', flex: 1, alignItems: 'center', backgroundColor: "lightblue", borderTopRightRadius: 10, borderBottomRightRadius: 10 }}>
+                                            <TouchableOpacity style={{ justifyContent: "center", alignItems: 'center', flexDirection: "column" }} onPress={() => navigation.navigate('BuyEther')}>
+                                                <Image
+                                                    style={{ width: 25, height: 25 }}
+                                                    source={require('../../assets/PNG/Ethereum.png')} />
+                                                <Text style={{ color: "#2d333a" }}>Buy</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity style={{ justifyContent: "center", alignItems: 'center', flexDirection: "column" }} onPress={() => setcount(true)}>
+                                                <Image
+                                                    style={{ width: 25, height: 25 }}
+                                                    source={require('../../assets/PNG/Receive.png')} />
+                                                <Text style={{ color: "#2d333a" }}>Receive</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity style={{ justifyContent: "center", alignItems: 'center', flexDirection: "column" }} onPress={() => navigation.navigate('SendEther', { address: address, name: name })}>
+                                                <Image
+                                                    style={{ width: 25, height: 25 }}
+                                                    source={require('../../assets/PNG/Send.png')} />
+                                                <Text style={{ color: "#2d333a" }}>Send</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                </Animated.View>
+                            )
+                        }}
+                    />
+                </FlingGestureHandler>
+            </FlingGestureHandler>
             <Modal
                 isVisible={count}
                 animationType={'fade'}
@@ -169,7 +265,7 @@ const MainInfo = ({ address, navigation, name }) => {
             </Modal>
         </>
     )
-}
+})
 
 export default MainInfo;
 const style = StyleSheet.create({

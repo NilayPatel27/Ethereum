@@ -32,7 +32,16 @@ const ConfirmMnemonics = ({ navigation, route }) => {
   // });
 
 
+const setItem = async() =>{
+  await AsyncStorage.setItem('login', 'true').then(value => {
+    console.log('value',value);
+    }  ).catch(err => {
+    console.log('err',err);
+    });
+}
+
   const onPressConfirm = () => {
+    setItem();
     // if (!Confirm.current.isValidSequence()) {
     //   Alert.alert('Invalid sequence', 'Please select the correct sequence');
     //   return null;

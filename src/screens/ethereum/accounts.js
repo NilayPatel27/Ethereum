@@ -1,21 +1,33 @@
 import axios from 'axios';
 import moment from 'moment';
+import '@ethersproject/shims';
 import { ethers } from 'ethers';
+import MainInfo from './mainInfo';
+import randomBytes from 'randombytes';
 import Modal from 'react-native-modal';
-import Coin from '../../data/crypto.json';
-import { useSelector } from 'react-redux';
-import QRCode from 'react-native-qrcode-svg';
+import converter from 'number-to-words';
+import MainInfoLeft from './mainInfoLeft';
 import FilterComponent from "./filterComponent";
-import {selectView} from '../../../counterSlice';
+import RBSheet from "react-native-raw-bottom-sheet";
+import React,{useState,useEffect,useRef} from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 // import { MotiView } from '@motify/components';
-import React,{useState,useEffect,useRef} from 'react'
-import Clipboard from '@react-native-community/clipboard';
 import { TabView, SceneMap,TabBar} from 'react-native-tab-view';
 import { LineChart, CandlestickChart } from "react-native-wagmi-charts";
-import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet, ToastAndroid, Share ,TouchableWithoutFeedback,ActivityIndicator,Animated,PanResponder,Dimensions,StatusBar, TextInput} from 'react-native'
-
+import {addressArray, selectAddress, selectView} from '../../../counterSlice';
+import Back from '../../assets/BackButton.svg'
+import { View, Text, Image, TouchableOpacity, StyleSheet, ToastAndroid, Share ,Button,TouchableWithoutFeedback,ActivityIndicator,Animated,PanResponder,Dimensions,StatusBar, TextInput, Pressable} from 'react-native';
+import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 
 const WalletPage = ({navigation,route}) => {
+  const {image} = route.params;
+  console.log('coins',image);
+  // const {address,name} = route.params;
+  let allAddress = useSelector(selectAddress);
+  const refRBSheet = useRef();
+  const textValue = useRef();
+  const [privateKey, setprivateKey] = useState('');
+  const [count, setcount] = useState(false);
   const [coin, setCoin] = useState(null);
   const [coinMarketData, setCoinMarketData] = useState(null);
   const [selectedRange, setSelectedRange] = useState("1");
@@ -23,8 +35,10 @@ const WalletPage = ({navigation,route}) => {
   const [coinCandleChartData, setCoinCandleChartData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [coinValue, setCoinValue] = useState("1");
+  const dispatch = useDispatch();
   const [isCandleChartVisible, setIsCandleChartVisible] = useState(false);
 
+const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
   
   const onSelectedRangeChange = (selectedRangeValue) => {
     setSelectedRange(selectedRangeValue);
@@ -90,9 +104,57 @@ const WalletPage = ({navigation,route}) => {
         setUsdValue(fetchedCoinData.market_data.current_price.usd.toString());
         setLoading(false);
       };
-    
-      
-      
+      const fetchCoinDatas = async () => {
+        const fetchedCoinData = await getDetailedCoinData('ethereum');
+        setCoin(fetchedCoinData);
+        setUsdValue(fetchedCoinData.market_data.current_price.usd.toString());
+      }
+      const createWallet = () =>{
+        let id = randomBytes(32).toString('hex');
+        let privateKey = '0x' + id;
+        // console.log(privateKey);
+        let wallet = new ethers.Wallet(privateKey);
+        wallet= wallet.connect(PROVIDER);
+        console.log(wallet.address);
+        console.log(wallet);
+        let obj = {
+          name: converter.toWordsOrdinal(allAddress.length),
+          address:wallet.address,
+          wallet:wallet
+        }
+        console.log(obj);
+        for(let i = 0; i < allAddress.length; i++){
+          if(allAddress[i].address === wallet.address){
+            return;
+          }
+        }
+        dispatch(addressArray(obj));
+      }
+      const importWallet = () =>{
+        console.log(privateKey);
+        const PROVIDER = new ethers.providers.getDefaultProvider('ropsten');
+        try{
+          let wallet = new ethers.Wallet(privateKey,PROVIDER);
+          wallet= wallet.connect(PROVIDER);
+          console.log(wallet.address);
+          let obj = {
+            name: converter.toWordsOrdinal(address.length),
+            address:wallet.address,
+            wallet:wallet,
+            privateKey:wallet.privateKey,
+          }
+          for(let i = 0; i < address.length; i++){
+            if(address[i].address === wallet.address){
+              return;
+            }
+          }
+        dispatch(addressArray(obj));
+        refRBSheet.current.close()
+        }
+        catch(e){
+          console.log('invalid private key');
+        } 
+      }
     // const {prices} = Coin
     
      const screenWidth = Dimensions.get('window').width;
@@ -142,8 +204,6 @@ const WalletPage = ({navigation,route}) => {
     { key: 'third', title: 'Chart' },
 
   ]);
-    const {address,name} = route.params;
-    const [count, setcount] = useState(false);
     const USD =Number('2824.96');
     // let isListGliding = useRef(false);
     const [balances, setbalances] = useState(null);
@@ -152,23 +212,24 @@ const WalletPage = ({navigation,route}) => {
     // console.log(address,name)
     useEffect(() => {
         console.log('sideview',sideview)
-        axios.get(`https://api-ropsten.etherscan.io/api?module=account&action=balance&address=${address}&apikey=349IQMJ71CEBWJ65I1U5G5N5NG43C37UZB&tag=latest`).then(res => { 
-        // console.log(res.data.result)
-          setbalances(res.data.result);
-      });
+        // axios.get(`https://api-ropsten.etherscan.io/api?module=account&action=balance&address=${address}&apikey=349IQMJ71CEBWJ65I1U5G5N5NG43C37UZB&tag=latest`).then(res => { 
+        // // console.log(res.data.result)
+        //   setbalances(res.data.result);
 
-      axios.get(`https://api-ropsten.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=999&sort=desc&apikey=349IQMJ71CEBWJ65I1U5G5N5NG43C37UZB`).then(res => {
+      // });
+
+      axios.get(`https://api-ropsten.etherscan.io/api?module=account&action=txlist&address=${allAddress[0].address}&startblock=0&endblock=99999999&page=1&offset=999&sort=desc&apikey=349IQMJ71CEBWJ65I1U5G5N5NG43C37UZB`).then(res => {
         // console.log(res.data.result)
         settransaction(res.data.result);
         fetchMarketCoinData(1);
-    fetchCoinData();
-    fetchCandleStickChartData();
+        fetchCoinData();
+        fetchCandleStickChartData();
         setres(true);
       });
-
-    }, [])
+     
+    }, []);
     if (loading || !coin || !coinMarketData || !coinCandleChartData) {
-        return <ActivityIndicator size="large" />;
+        return <ActivityIndicator size="large" color="#0000ff" style={{flex:1,justifyContent:"center",alignItems:"center",flexDirection:"row"}} />;
     }
     const {
         id,
@@ -186,6 +247,7 @@ const WalletPage = ({navigation,route}) => {
         const floatValue = parseFloat(value.replace(",", ".")) || 0;
         setUsdValue((floatValue * current_price.usd).toString());
       };
+
       const changeUsdValue = (value) => {
         setUsdValue(value);
         const floatValue = parseFloat(value.replace(",", ".")) || 0;
@@ -194,34 +256,22 @@ const WalletPage = ({navigation,route}) => {
     
     const { prices } = coinMarketData;
 
-    const copyToClipboard =(index)=>{
-        ToastAndroid.show('Address Copied to clipboard', ToastAndroid.SHORT);
-         return Clipboard.setString(address);
-      }
-      const share = () => {
-             Share.share({
-                message: address,
-            });
-        }
-            const renderColumn = (icon, label, action) => (
-            <TouchableWithoutFeedback onPress={action}>
-                <View style={style.actionColumn}>
-                    {/* <Icon name={icon} style={styles.actionIcon} /> */}
-                    {icon=='copy'?
-                    <Image 
-                        source={require('../../assets/PNG/copy.png')}
-                        style={{height:25,width:25}}
-                    />:<Image 
-                    source={require('../../assets/PNG/Send.png')}
-                    style={{height:25,width:25}}
-                />}
-                    <Text style={{color:"#2d333a"}}>{label}</Text>
-                </View>
-            </TouchableWithoutFeedback>
-        );
+    
         const onLayout=(event)=> {
             const {x, y, height, width} = event.nativeEvent.layout;
             // console.log(x, y, height, width);
+          }
+
+          const relodeData = () => {
+            // console.log('reload')
+            setres(false);
+            fetchMarketCoinData(1);
+            fetchCoinDatas();
+            fetchCandleStickChartData();
+            setTimeout(() => {
+              
+              setres(true)
+            }, 1000);
           }
         //   const LoadingIndicator = ({size}) => {
         //       return(
@@ -265,20 +315,24 @@ const WalletPage = ({navigation,route}) => {
             <View style={{flex:1,justifyContent:"flex-start",flexDirection:'column',backgroundColor:"#fff",padding:10}}>
         {res==false
         ?
-        // <LoadingIndicator size={100}/>
+        <>
+        {console.log('reloadddddd')}
+        {/* // <LoadingIndicator size={100}/> */}
         <ActivityIndicator  size="small" color="#0000ff" style={{flex:1,justifyContent:"center",alignItems:"center",flexDirection:"row"}}/>
+        </>
         :
         <>
-            {transaction.length==0?<View style={{backgroundColor:"transparent",flex:1,justifyContent:"center",alignItems:"center"}}>
+            { transaction.length==0
+            ?<View style={{backgroundColor:"transparent",flex:1,justifyContent:"center",alignItems:"center"}}>
                 <Text style={{fontSize:20,fontWeight:'bold',color:"#2d333a"}}>No Transaction</Text>
-            </View>:
-            <>
+            </View>
+            :<>
             <Image
             source={require('../../assets/PNG/Ethereum.png')}
             style={{height:"100%",width:"100%",position:"absolute",justifyContent:'center',alignItems:"center"}}
             blurRadius={5}
-            resizeMode="stretch"
-        />
+            resizeMode="stretch"/>
+
             <Animated.FlatList
                 data={transaction}
                 // onScroll={Animated.event(
@@ -313,13 +367,13 @@ const WalletPage = ({navigation,route}) => {
                    return (
                     <>
                     {/* {console.log(item.to,address)} */}
-                    {item.to== address.toLowerCase()
-                    ?<Animated.View style={[style.firstView
-                        ,
+                    {item.to== allAddress[0].address.toLowerCase()
+                    ?<Animated.View style={[style.firstView,
                         // { opacity,
                         // transform:[{scale}]
                         // }
                         ]} onLayout={(event)=>onLayout(event)}>
+                          <View  style={{width:'100%',height:4,backgroundColor:"lightgreen"}}/>
                         <View style={style.secondView}>
                             <View style={style.thirdView}>
                                 <View style={style.fourthView}>
@@ -331,10 +385,10 @@ const WalletPage = ({navigation,route}) => {
                                         <Text style={[style.text,{textAlign:"center"}]}>{item.value?Number(ethers.utils.formatEther(item.value)).toFixed(4):null}</Text>
                                         <Text style={[style.text,{textAlign:"center"}]}>ETH</Text>
                                     </View>
-                                    <Image
+                                    {/* <Image
                                         style={{width:30,height:30}}
                                         source={require('../../assets/PNG/down.png')}
-                                    />
+                                    /> */}
                                 </View>
                             </View>
                             <View style={{flexDirection:"row",justifyContent:'space-between',backgroundColor:"transparent",flex:1}}>
@@ -354,6 +408,7 @@ const WalletPage = ({navigation,route}) => {
                     </Animated.View>
                     :<Animated.View style={[style.firstView,{ opacity,
                         transform:[{scale}]}]} onLayout={(event)=>onLayout(event)}>
+                          <View  style={{width:'100%',height:4,backgroundColor:"red"}}/>
                         <View style={style.secondView}>
                             <View style={style.thirdView}>
                                 <View style={style.fourthView}>
@@ -366,10 +421,10 @@ const WalletPage = ({navigation,route}) => {
                                         <Text style={[style.text,{textAlign:"center"}]}>{item.value?Number(ethers.utils.formatEther(item.value)).toFixed(4):null}</Text>
                                         <Text style={[style.text,{textAlign:"center"}]}>ETH</Text>
                                     </View>
-                                    <Image
+                                    {/* <Image
                                         style={{width:30,height:30}}
                                         source={require('../../assets/PNG/up.png')}
-                                    />
+                                    /> */}
                                 </View>
                             </View>
                             <View style={{flexDirection:"row",justifyContent:'space-between',backgroundColor:"transparent",flex:1}}>
@@ -396,6 +451,7 @@ const WalletPage = ({navigation,route}) => {
                 keyExtractor={item => item.hash}
                 showsVerticalScrollIndicator={false}
                 ItemSeparatorComponent={() => <View style={{height:10,backgroundColor:"transparent"}}/>}
+                ListHeaderComponent={() => <View style={{height:10,backgroundColor:"transparent"}}/>}
             />
             </>
             }
@@ -405,13 +461,19 @@ const WalletPage = ({navigation,route}) => {
             }
           
           const SecondRoute = () => (
+            res==false
+              ?<ActivityIndicator  size="small" color="#0000ff" style={{flex:1,justifyContent:"center",alignItems:"center",flexDirection:"row"}}/>
+              :
             <View style={{backgroundColor:"transparent",flex:1,justifyContent:"center",alignItems:"center"}}>
             <Text style={{fontSize:20,fontWeight:'bold',color:"#2d333a"}}>No Tokens</Text>
         </View>
+
             );
            
-          const ThirdRoute = () => {
+          const ThirdRoute = gestureHandlerRootHOC(() => {
               return(
+                res==false
+                ?<ActivityIndicator  size="small" color="#0000ff" style={{flex:1,justifyContent:"center",alignItems:"center",flexDirection:"row"}}/>:
                 <View style={{ paddingHorizontal: 10 }}>
                     <View style={style.filtersContainer}>
                         {filterDaysArray.map((day) => (
@@ -433,7 +495,7 @@ const WalletPage = ({navigation,route}) => {
               style={style.input}
               value={coinValue}
               keyboardType="numeric"
-              onChangeText={changeCoinValue}
+              onChangeText={number =>changeCoinValue(number)}
             />
           </View>
           <View style={{ flexDirection: "row", flex: 1 }}>
@@ -442,14 +504,17 @@ const WalletPage = ({navigation,route}) => {
               style={style.input}
               value={usdValue}
               keyboardType="numeric"
-              onChangeText={changeUsdValue}
+              onChangeText={number =>changeUsdValue(number)}
             />
           </View>
         </View>
                     <LineChart.Provider data={prices.map(([timestamp, value]) => ({ timestamp, value }))}>
                         <LineChart height={screenWidth / 2} width={screenWidth}>
-                            <LineChart.Path color='red'/>
-                            <LineChart.CursorCrosshair color='red'>
+                            <LineChart.Path color='blue'>
+                            <LineChart.Gradient color="blue" />
+                            <LineChart.HorizontalLine at={{ value: 3027.84 }} />
+                            </LineChart.Path>
+                            <LineChart.CursorCrosshair >
                     <LineChart.Tooltip />
                     </LineChart.CursorCrosshair>
                         </LineChart>
@@ -474,7 +539,7 @@ const WalletPage = ({navigation,route}) => {
               </CandlestickChart.Crosshair>
             </CandlestickChart>
             <View style={style.candleStickDataContainer}>
-              <View>
+              <View style={{flexDirection:"column",justifyContent:"space-evenly",alignItems:"center"}}>
                 <Text style={style.candleStickTextLabel}>Open</Text>
                 <CandlestickChart.PriceText
                   style={style.candleStickText}
@@ -510,7 +575,7 @@ const WalletPage = ({navigation,route}) => {
 
        
                 </View>
-            )};
+            )});
           
           const renderScene = SceneMap({
             first: FirstRoute,
@@ -535,9 +600,14 @@ const WalletPage = ({navigation,route}) => {
           const renderTabBar = (props) => {
             return (
                 <>
-                <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"center"}}>
+                <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"center",backgroundColor:"transparent"}}>
                 <Text style={{paddingLeft:10,fontWeight:"bold",fontSize:20,color:"#2d333a"}}>{routes[index].title}</Text>
-                    <TabBar
+                <TouchableOpacity style={{marginRight:"auto",marginLeft:10}} onPress={()=>relodeData()}>
+                  <Image
+                  style={{width: 20, height: 20}}
+                  source={require('../../assets/PNG/refresh.png')}/>
+                </TouchableOpacity>
+                <TabBar
                         {...props}
                         // onTabPress={({ route, preventDefault }) => {
                         //     // if (isListGliding.current) {
@@ -564,94 +634,41 @@ const WalletPage = ({navigation,route}) => {
         };
   return (
       <>
-    <View style={{height:"30%",width:"100%",backgroundColor:"#fff",padding:15,flexDirection:'column',justifyContent:"flex-start"}}>
-        {sideview==true?
-        <Animated.View style={{transform: [{ translateX: pan.x }, { translateY: pan.y }],flexDirection:"row",justifyContent:"space-between",flex:1}} {...panResponder.panHandlers} >
-            <View style={{width:"70%",height:"100%",backgroundColor:"#002147",flexDirection:'row',justifyContent:'flex-start',alignItems:"center",borderTopLeftRadius:10,borderBottomLeftRadius:10}}>
-                <View style={{width:'30%',height:"100%",backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"flex-end"}}>
-                    <Text style={style.orange}>Name</Text>
-                    <Text style={style.orange}>Address</Text>
-                    <Text style={style.orange}>Balance</Text>
-                    <Text style={style.orange}>Dollar</Text>
-                </View>
-                <View style={{width:"5%",height:"100%",backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"center"}}>
-                    <Text style={style.orange}>:</Text>
-                    <Text style={style.orange}>:</Text>
-                    <Text style={style.orange}>:</Text>
-                    <Text style={style.orange}>:</Text>
-                </View>
-                <View style={{height:"100%",flex:1,backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"flex-start"}}>
-                    <Text style={{fontSize:15,fontWeight:'bold',alignItems:"center",color:'#fff'}}>{name}</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold',color:'#fff'}}>{address.slice(0, 5)+'...'+address.slice(
-                                address.length - 4,
-                                address.length,
-                                )}</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold',color:'#fff'}}>{balances?Number(ethers.utils.formatEther(balances)).toFixed(4):null} ETH</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold',color:'#fff'}}>${balances?(USD*(ethers.utils.formatEther(balances))).toFixed(2):null}</Text>
+      <View style={{flexDirection:'row',height:'8%',justifyContent:"space-between",width:"100%",alignSelf:"center",backgroundColor:'#fff',alignItems:"center",padding:10}}>
+          <TouchableOpacity onPress={()=>navigation.goBack()}>
+              <Back height={30} width={30} fill={'#000'} style={{marginRight:10}}/>
+          </TouchableOpacity>
+
+            <View style={{backgroundColor:"transparent",flexDirection:"row",flex:1,alignItems:'center'}}>
+              <Image
+                    source={{ uri: image }}
+                    style={{
+                        height: 40,
+                        width: 40,
+                        // marginRight: 10,
+                        alignSelf: "center",
+                    }}
+                />
+                <View>
+                    <Text style={{color:"#2d333a",fontSize:20,fontWeight:'bold'}}>{symbol.toUpperCase()}</Text>
+                    <Text style={{color:"#2d333a",fontSize:20,fontWeight:'bold'}}>${usdValue}</Text>
                 </View>
             </View>
-            <View style={{flexDirection:"column",justifyContent:'space-evenly',flex:1,alignItems:'center',backgroundColor:"lightblue",borderTopRightRadius:10,borderBottomRightRadius:10}}>
-                    <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>navigation.navigate('BuyEther')}>
-                    <Image
-                        style={{width: 25, height: 25}}
-                        source={require('../../assets/PNG/Ethereum.png')}/> 
-                        <Text style={{color:"#2d333a"}}>Buy</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>setcount(true)}>
-                    <Image
-                        style={{width: 25, height: 25}}
-                        source={require('../../assets/PNG/Receive.png')}/> 
-                        <Text style={{color:"#2d333a"}}>Receive</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>navigation.navigate('SendEther',{address:address,name:name})}>
-                    <Image
-                        style={{width: 25, height: 25}}
-                        source={require('../../assets/PNG/Send.png')}/>
-                        <Text style={{color:"#2d333a"}}>Send</Text>
-                    </TouchableOpacity>
-            </View>
-        </Animated.View>
-        :
-        <Animated.View style={{transform: [{ translateX: pan.x }, { translateY: pan.y }],flexDirection:"row",justifyContent:"space-between",flex:1}} {...panResponder.panHandlers}>
-            <View style={{flexDirection:"column",justifyContent:'space-evenly',flex:1,alignItems:'center',backgroundColor:"lightblue",borderTopLeftRadius:10,borderBottomLeftRadius:10}}>
-                    <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>navigation.navigate('BuyEther')}>
-                        <Image style={{width: 25, height: 25}} source={require('../../assets/PNG/Ethereum.png')}/> 
-                        <Text style={{color:"#2d333a"}}>Buy</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>setcount(true)}>
-                        <Image style={{width: 25, height: 25}} source={require('../../assets/PNG/Receive.png')}/> 
-                        <Text style={{color:"#2d333a"}}>Receive</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{justifyContent:"center",alignItems:'center',flexDirection:"column"}} onPress={()=>navigation.navigate('SendEther',{address:address,name:name})}>
-                        <Image style={{width: 25, height: 25}} source={require('../../assets/PNG/Send.png')}/>
-                        <Text style={{color:"#2d333a"}}>Send</Text>
-                    </TouchableOpacity>
-            </View>
-            <View style={{width:"70%",height:"100%",backgroundColor:"#002147",flexDirection:'row',justifyContent:'flex-start',alignItems:"center",borderTopRightRadius:10,borderBottomRightRadius:10}}>
-                <View style={{height:"100%",flex:1,backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"flex-end"}}>
-                    <Text style={{fontSize:15,fontWeight:'bold',color:"#fff"}}>{name}</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold',color:"#fff"}}>{address.slice(0, 5)+'...'+address.slice(
-                                address.length - 4,
-                                address.length,
-                                )}</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold',color:"#fff"}}>{balances?Number(ethers.utils.formatEther(balances)).toFixed(4):null} ETH</Text>
-                    <Text style={{fontSize:15,fontWeight:'bold',color:"#fff"}}>${balances?(USD*(ethers.utils.formatEther(balances))).toFixed(2):null}</Text>
-                </View>
-                <View style={{width:"5%",height:"100%",backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"center"}}>
-                    <Text style={style.orange}>:</Text>
-                    <Text style={style.orange}>:</Text>
-                    <Text style={style.orange}>:</Text>
-                    <Text style={style.orange}>:</Text>
-                </View>
-                <View style={{width:'30%',height:"100%",backgroundColor:'transparent',flexDirection:"column",justifyContent:"space-evenly",alignItems:"flex-start"}}>
-                    <Text style={style.orange}>Name</Text>
-                    <Text style={style.orange}>Address</Text>
-                    <Text style={style.orange}>Balance</Text>
-                    <Text style={style.orange}>Dollar</Text>
-                </View>
-            </View>
-            
-        </Animated.View>}
+
+          <TouchableOpacity onPress={()=>setcount(true)}>
+            <Image style={{width: 35, height: 35, }} source={require('../../assets/PNG/Plus1.png')} />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={()=>refRBSheet.current.open()}>
+          <Image source={require('../../assets/PNG/down.png')} style={{width: 35, height: 35,marginLeft:10}} />
+          </TouchableOpacity>
+
+        </View>
+    <View style={{height:"35%",width:"100%",backgroundColor:"#fff",padding:15,flexDirection:'row',justifyContent:"flex-start"}}>
+        {sideview==true
+        ?<MainInfo address={allAddress[0].address} navigation={navigation} name={allAddress[0].name}/>
+        :<MainInfoLeft address={allAddress[0].address} navigation={navigation} name={allAddress[0].name}/>
+       }
     </View>
         <TabView
       navigationState={{ index, routes }}
@@ -661,9 +678,7 @@ const WalletPage = ({navigation,route}) => {
       style={style.containers}
       tabBarPosition="top"
       renderTabBar={renderTabBar}
-
     />
-   
     <Modal
         isVisible={count}
         animationType={'fade'}
@@ -679,20 +694,64 @@ const WalletPage = ({navigation,route}) => {
         // animationOut={'zoomOut'}
         // animationOutTiming={1}
       >
-        <View style={style.container}>
-                <Text style={style.centered}>Show the code below to receive coins</Text>
-                <View style={style.centered}>
-                    <QRCode size={200} value={address} /> 
-                </View>
-                <Text style={style.centered}>{address}</Text>
-                <View style={style.actions}>
-                    <View style={style.actionsBar}>
-                        {renderColumn('copy', 'Copy', () => copyToClipboard())}
-                        {renderColumn('share', 'Share', () => share())}
-                    </View>
-                </View>
+        {allAddress.length>=10?<View style={style.mainView}>
+          <Text style={{ color: '#2d333a',fontWeight:'bold',fontSize:20,textAlign:"center"}}>You have reached to the maxiumm number of an account, you can not create another account</Text>
+          <View style={{backgroundColor:"transparent",flexDirection:"row",justifyContent:"space-evenly",width:"100%"}}>
+          <TouchableOpacity  style={{ justifyContent: "center", flexDirection: "row" }} onPress={()=>setcount(false)}>
+            <View style={style.button}>
+              <Text style={{ color: "#fff", fontSize: 20 }}>Ok</Text>
             </View>
+          </TouchableOpacity>
+          </View>
+        </View>:
+        <View style={style.mainView}>
+          <Text style={{ color: '#2d333a',fontWeight:'bold',fontSize:20,textAlign:"center"}}>Are you sure you want to create an account</Text>
+          <View style={{backgroundColor:"transparent",flexDirection:"row",justifyContent:"space-evenly",width:"100%"}}>
+          <TouchableOpacity  style={{ justifyContent: "center", flexDirection: "row" }} onPress={()=>setcount(false)}>
+            <View style={style.button}>
+              <Text style={{ color: "#fff", fontSize: 20 }}>No</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity  style={{ justifyContent: "center", flexDirection: "row" }} onPress={() => { setcount(false); createWallet() }}>
+            <View style={style.button}>
+              <Text style={{ color: "#fff", fontSize: 20 }}>Yes</Text>
+            </View>
+          </TouchableOpacity>
+          </View>
+        </View>}
       </Modal>
+      <RBSheet
+          ref={refRBSheet}
+          closeOnDragDown={true}
+          customStyles={{
+            wrapper: {
+              backgroundColor: "transparent",
+              animationType: "fade",
+            },
+            draggableIcon: {
+              backgroundColor: "#1e90ff"
+            },
+          }}
+          closeOnPressMask={true}
+          height={200}
+        >
+          <View style={{flex:1,padding:10,justifyContent:"space-evenly"}}>
+            <Text style={{textAlign:"center"}}>Enter Private key to import account</Text>
+            <TextInput
+              ref={textValue}
+              style={{height: 40, borderColor: 'gray', borderWidth: 1,borderRadius:5,marginTop:10}}
+              onChangeText={(text) => {
+                setprivateKey(text);
+              }}/>
+              <Button
+              title="Import"
+              onPress={()=>{
+                importWallet();
+                // console.log(privateKey);
+              }}
+              />
+         </View>
+        </RBSheet>
     </>
   )
 }
@@ -700,11 +759,11 @@ const WalletPage = ({navigation,route}) => {
 export default WalletPage;
 const style = StyleSheet.create({
     firstView:{
-        flexDirection:"row",justifyContent:"center",alignItems:"center",width:'100%',backgroundColor:"transparent",height:100
+        flexDirection:"column",justifyContent:"center",alignItems:"center",width:'100%',backgroundColor:"transparent",height:100
     },
     secondView:{
-        width:'100%',height:"100%",justifyContent:"space-evenly",flexDirection:"column",padding:6,paddingLeft:5,backgroundColor:"#202020",
-        borderRadius:6,shadowColor: '#002147',shadowOffset: { width: 0, height: 5 },shadowOpacity: 0.34,shadowRadius: 6.27,elevation: 10
+        width:'100%',height:"100%",justifyContent:"space-evenly",flexDirection:"column",padding:5,paddingLeft:10,backgroundColor:"#2c2e3b",
+       borderBottomRightRadius:6,borderBottomLeftRadius:6
     },
     thirdView:{
         alignItems:"flex-start",flexDirection:"row",justifyContent:"space-between",height:"50%",backgroundColor:"transparent"
@@ -817,10 +876,12 @@ const style = StyleSheet.create({
         justifyContent: "space-between",
         marginHorizontal: 10,
         marginTop: 20,
-        backgroundColor:"red"
+        backgroundColor:"red",
+        width:"100%",
+        alignSelf:"center"
       },
       candleStickTextLabel: {
         color: 'grey',
-        fontSize: 13
+        fontSize: 13,
       }
   });

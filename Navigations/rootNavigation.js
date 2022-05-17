@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, TextInput, Button, Switch, ToastAndroid } from 'react-native';
+import React, { useState } from 'react';
+import { Switch, ToastAndroid } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Counter from '../Counter';
 import CreateAccount from '../src/screens/createAccount';
 import CreateMnemonics from '../src/screens/createMnemonics';
 import ConfirmMnemonics from '../src/screens/confirmMnemonics';
@@ -10,10 +9,9 @@ import ConfirmBox from '../src/screens/confirmMnemonics/ConfirmBox';
 import HomePage from '../src/screens/homePage';
 import Ethereum from '../src/screens/ethereum';
 import ImportAccount from '../src/screens/importAccount';
-import RBSheet from "react-native-raw-bottom-sheet";
-import WalletPage from '../src/screens/ethereum/walletPage';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectAddress, view } from '../counterSlice';
+import WalletPage from '../src/screens/ethereum/accounts';
+import { useDispatch } from 'react-redux';
+import { view } from '../counterSlice';
 import BuyEther from '../src/screens/buyEther';
 import SendEther from '../src/screens/send/index';
 import AmountPage from '../src/screens/confirmTransaction/amountPage';
@@ -39,21 +37,6 @@ const screenOptions = {
 const rootNavigation = ({ loginValue }) => {
   const [isEnabled, setIsEnabled] = useState(false);
   const dispatch = useDispatch();
-  var address = useSelector(selectAddress);
-
-  // console.log('address',address);
-
-  // setTimeout(() => {
-  //   console.log('address',address);
-  // }, 1000);
-  // useEffect(() => {
-  //   AsyncStorage.getItem('login').then(value => {
-  //     console.log('value', value);
-  //   }).catch(err => {
-  //     console.log('err', err);
-  //   });
-  // }, [])
-
   const toggleSwitch = () => {
     setIsEnabled(previousState => !previousState);
     {
@@ -66,14 +49,11 @@ const rootNavigation = ({ loginValue }) => {
 
   console.log('loginValue', loginValue);
   return (
+
     <NavigationContainer>
       <Stack.Navigator
         initialRouteName={loginValue === "true" ? 'HomePage' : 'CreateAccount'}
         screenOptions={screenOptions}>
-        {/* <Stack.Screen name="NewSplash" component={NewSplash} loginValue={loginValue} /> */}
-        {/* <Stack.Screen name='NewSplash' options={{ title: 'NewSplash' }}>
-          {(props) => <NewSplash {...props} />}
-        </Stack.Screen> */}
         <Stack.Screen name="Test" component={Test} />
         <Stack.Screen name="CreateAccount" component={CreateAccount} />
         <Stack.Screen name="BuyEther" component={BuyEther} />
@@ -101,7 +81,7 @@ const rootNavigation = ({ loginValue }) => {
         )} component={HomePage} />
         <Stack.Screen name="Accounts" component={Ethereum} />
         <Stack.Screen name="ImportAccount" component={ImportAccount} />
-        <Stack.Screen name="WalletPage" component={WalletPage} />
+        <Stack.Screen name="WalletPage" component={WalletPage} options={{ headerShown: false }} />
         <Stack.Screen name="CoinItem" component={CoinItem} />
       </Stack.Navigator>
     </NavigationContainer >

@@ -164,6 +164,41 @@ const HomePage = ({ navigation }) => {
       </>
     );
   };
+
+  // const refetchCoins = async () => {
+  //   if (loading) {
+  //     return;
+  //   }
+  //   setLoading(true);
+  //   const coinsData = await getMarketData();
+  //   setCoins(coinsData);
+  //   setLoading(false);
+  // };
+
+  // useEffect(() => {
+  //   fetchCoins();
+  // }, []);
+
+  // var address = useSelector(selectAddress);
+  // const array = [{ name: 'ETH' }];
+  // const Header = () => {
+  //   return (
+  //     <View style={{ height: 200, backgroundColor: '#2c2e3b', justifyContent: 'center' }} >
+  //       <View style={{ margin: 15, backgroundColor: 'rgba(52, 52, 52, 0.8)', height: 160, borderRadius: 10, justifyContent: "center", paddingLeft: 15 }}>
+  //         <View>
+  //           <Text style={{ fontSize: 20, color: '#fff', marginLeft: 5 }}>Total Amount</Text>
+  //           <Text style={{ fontSize: 15, color: '#969aa0', marginLeft: 5 }}>0 Account / 0 Cryptos</Text>
+  //           <TouchableOpacity onPress={() => setInfo(!info)} style={{ position: 'absolute', right: 135, top: 25 }}>
+  //             {info === true ?
+  //               <HideInfo height={25} width={25} /> : <ShowInfo height={25} width={25} />}
+  //           </TouchableOpacity>
+  //           {info === true ?
+  //             <Text style={{ fontSize: 40, color: '#fff', marginLeft: 5 }}>$0.00</Text> : <Text style={{ fontSize: 40, color: '#fff', marginLeft: 5 }}>********</Text>}
+  //         </View>
+  //       </View>
+  //     </View>
+  //   )
+  // }
   return (
     <>
       <View style={{ flex: 1, backgroundColor: '#2c2e3b', flexDirection: 'column' }}>
