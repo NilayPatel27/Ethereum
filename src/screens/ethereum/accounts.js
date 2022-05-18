@@ -39,6 +39,7 @@ const WalletPage = ({navigation,route}) => {
   const [load, setload] = useState(false)
   const dispatch = useDispatch();
   const [isCandleChartVisible, setIsCandleChartVisible] = useState(false);
+  const [tab, settab] = useState(1)
 
 const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
   
@@ -223,7 +224,7 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
 
       // });
 
-      axios.get(`https://api-ropsten.etherscan.io/api?module=account&action=txlist&address=${allAddress[0].address}&startblock=0&endblock=99999999&page=1&offset=999&sort=desc&apikey=349IQMJ71CEBWJ65I1U5G5N5NG43C37UZB`).then(res => {
+      axios.get(`https://api-ropsten.etherscan.io/api?module=account&action=txlist&address=${allAddress[1].address}&startblock=0&endblock=99999999&page=1&offset=999&sort=desc&apikey=349IQMJ71CEBWJ65I1U5G5N5NG43C37UZB`).then(res => {
         // console.log(res.data.result)
         settransaction(res.data.result);
         fetchMarketCoinData(1);
@@ -323,6 +324,7 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
         };
   return (
       <>
+      {/* Header start*/}
       <View style={{flexDirection:'row',height:'8%',justifyContent:"space-between",width:"100%",alignSelf:"center",backgroundColor:'#fff',alignItems:"center",padding:10}}>
           <TouchableOpacity onPress={()=>navigation.goBack()}>
               <Back height={30} width={30} fill={'#000'} style={{marginRight:10}}/>
@@ -356,13 +358,17 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
           </TouchableOpacity>
 
         </View>
+        {/* Header end*/}
+        {/* account card start*/}
     <View style={{height:"30%",width:"100%",backgroundColor:"#2B2B2B",padding:15,flexDirection:'row',justifyContent:"flex-start"}}>
-        {sideview==true
-        ?<MainInfo address={allAddress[0].address} navigation={navigation} name={allAddress[0].name}/>
-        :<MainInfoLeft address={allAddress[0].address} navigation={navigation} name={allAddress[0].name}/>
-       }
+        {/* {sideview==true */}
+        {/* ? */}
+        <MainInfo address={allAddress[1].address} navigation={navigation} name={allAddress[1].name}/>
+        {/* :<MainInfoLeft address={allAddress[1].address} navigation={navigation} name={allAddress[1].name}/> */}
+       {/* } */}
     </View>
-        <TabView
+    {/* account card end*/}
+        {/* <TabView
       navigationState={{ index, routes }}
       renderScene={renderScene}
       onIndexChange={index =>{setIndex(index);console.log(index)}}
@@ -370,7 +376,33 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
       style={style.containers}
       tabBarPosition="top"
       renderTabBar={renderTabBar}
-    />
+    /> */}
+    <View style={{flexDirection:"row",justifyContent:"space-evenly",alignItems:"center",backgroundColor:"#fff",height:45,padding:10}}>
+          <Text style={{fontWeight:"bold",fontSize:20,color:"#000"}}>{routes[tab-1].title}</Text>
+          <TouchableOpacity style={{marginRight:"auto",marginLeft:10,alignItems:"center"}} onPress={()=>relodeData()}>
+            <Image
+            style={{width: 20, height: 20}}
+            source={require('../../assets/PNG/refresh.png')}/>
+          </TouchableOpacity>
+          <View style={{flexDirection:"row",justifyContent:'space-evenly',alignItems:"center",flex:0.5}}>
+            <TouchableOpacity onPress={()=>settab(1)}>
+                  <Image
+                  style={{width: 20, height: 20}}
+                  source={require('../../assets/PNG/up_down.png')}/> 
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>settab(2)}>
+                <Image
+                style={{width: 20, height: 20}}
+                source={require('../../assets/PNG/Ethereum.png')}/>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>settab(3)}>
+                <Image
+                style={{width: 20, height: 20}}
+                source={require('../../assets/PNG/linechart.png')}/>
+            </TouchableOpacity>
+          </View>
+    </View>
+    {tab == 1?<FirstRoute /> :tab==2?<SecondRoute/>:<ThirdRoute/>}
     <Modal
         isVisible={count}
         animationType={'fade'}
@@ -450,30 +482,15 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
 
 export default WalletPage;
 const style = StyleSheet.create({
-    firstView:{
-        flexDirection:"column",justifyContent:"center",alignItems:"center",width:'100%',backgroundColor:"transparent",height:100
-    },
-    secondView:{
-        width:'100%',height:"100%",justifyContent:"space-evenly",flexDirection:"column",padding:5,paddingLeft:10,backgroundColor:"#2c2e3b",
-       borderBottomRightRadius:6,borderBottomLeftRadius:6
-    },
-    thirdView:{
-        alignItems:"flex-start",flexDirection:"row",justifyContent:"space-between",height:"50%",backgroundColor:"transparent"
-    },
-    fourthView:{
-        flexDirection:"column",justifyContent:"space-evenly",height:"100%",width:"60%"
-    },
-    fifthView:{
-        flex:1,height:"100%",backgroundColor:"transparent",flexDirection:"row",alignItems:"center",justifyContent:"space-evenly"
-    },
-    seventhView:{
-        flexDirection:"column",justifyContent:'space-between',alignItems:"center",backgroundColor:"transparent",width:"50%"
-    },
-    eightView:{
-        flexDirection:"row",justifyContent:"space-evenly",backgroundColor:'transparent',alignItems:"center",flex:1
-    },
     tabBar:{
-        height: 48,backgroundColor:"#fff",width:"35%",flexDirection:"row",justifyContent:"flex-end",alignSelf:"flex-end",marginRight:10,shadowColor:"#fff"
+        height: 48,
+        backgroundColor:"#fff",
+        width:"35%",
+        flexDirection:"row",
+        justifyContent:"flex-end",
+        alignSelf:"flex-end",
+        marginRight:10,
+        shadowColor:"#fff"
     },
     text:{
         color:"#fff",
@@ -487,7 +504,9 @@ const style = StyleSheet.create({
         textAlign:"left"
     },
     orange:{
-        fontSize:15,fontWeight:'bold',color:'orange'
+        fontSize:15,
+        fontWeight:'bold',
+        color:'orange'
     },
     mainView:{
       flexDirection: 'column',

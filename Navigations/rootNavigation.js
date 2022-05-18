@@ -1,22 +1,24 @@
+import Test from '../test';
 import React,{useState} from 'react';
-import {Switch, ToastAndroid} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import CreateAccount from '../src/screens/createAccount';
-import CreateMnemonics from '../src/screens/createMnemonics';
-import ConfirmMnemonics from '../src/screens/confirmMnemonics';
-import ConfirmBox from '../src/screens/confirmMnemonics/ConfirmBox';
+import { view } from '../counterSlice';
+import { useDispatch } from 'react-redux';
 import HomePage from '../src/screens/homePage';
 import Ethereum from '../src/screens/ethereum';
+import BuyEther from '../src/screens/buyEther';
+import {Switch, ToastAndroid} from 'react-native';
+import SendEther from '../src/screens/send/index';
+import CreateAccount from '../src/screens/createAccount';
 import ImportAccount from '../src/screens/importAccount';
 import WalletPage from '../src/screens/ethereum/accounts';
-import { useDispatch } from 'react-redux';
-import { view } from '../counterSlice';
-import BuyEther from '../src/screens/buyEther';
-import SendEther from '../src/screens/send/index';
+import {NavigationContainer} from '@react-navigation/native';
+import CreateMnemonics from '../src/screens/createMnemonics';
+import CoinDetails from '../src/screens/ethereum/coinDetails';
+import ConfirmMnemonics from '../src/screens/confirmMnemonics';
+import ConfirmBox from '../src/screens/confirmMnemonics/ConfirmBox';
 import AmountPage from '../src/screens/confirmTransaction/amountPage';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import CofirmTransaction from '../src/screens/confirmTransaction/cofirmTransaction';
-import Test from '../test';
+
 const Stack = createNativeStackNavigator();
 
 const screenOptions = {
@@ -62,6 +64,7 @@ const rootNavigation = ({ loginValue }) => {
         <Stack.Screen name="HomePage" component={HomePage} />
         <Stack.Screen name="Accounts" component={Ethereum} />
         <Stack.Screen name="ImportAccount" component={ImportAccount} />
+        <Stack.Screen name="CoinDetails" component={CoinDetails} options={{headerShown:false}} />
         <Stack.Screen name="WalletPage" component={WalletPage} options={{headerShown:false}} />
       </Stack.Navigator>
     </NavigationContainer >

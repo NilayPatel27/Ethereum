@@ -83,7 +83,7 @@ const MainInfo = gestureHandlerRootHOC(({address,navigation,name}) => {
       }
       const share = () => {
              Share.share({
-                message: address,
+                message: address.slice(0,8)+'...'+address.slice(34,address.length),
             });
         }
         const setActiveSlide = useCallback(newIndex => {
@@ -91,22 +91,6 @@ const MainInfo = gestureHandlerRootHOC(({address,navigation,name}) => {
           reactiveAnimated.setValue(newIndex);
         }
         )
-            const renderColumn = (icon, label, action) => (
-            <TouchableWithoutFeedback onPress={action}>
-                <View style={style.actionColumn}>
-                    {/* <Icon name={icon} style={styles.actionIcon} /> */}
-                    {icon=='copy'?
-                    <Image 
-                        source={require('../../assets/PNG/copy.png')}
-                        style={{height:25,width:25}}
-                    />:<Image 
-                    source={require('../../assets/PNG/Send.png')}
-                    style={{height:25,width:25}}
-                />}
-                    <Text style={{color:"#2d333a"}}>{label}</Text>
-                </View>
-            </TouchableWithoutFeedback>
-        );
     if(!res){
         return null;
     }
@@ -251,17 +235,28 @@ const MainInfo = gestureHandlerRootHOC(({address,navigation,name}) => {
     // animationOut={'zoomOut'}
     // animationOutTiming={1}
   >
-    <View style={style.container}>
-            <Text style={style.centered}>Show the code below to receive coins</Text>
+        <View style={style.container}>
             <View style={style.centered}>
                 <QRCode size={200} value={address} /> 
             </View>
-            <Text style={style.centered}>{address}</Text>
-            <View style={style.actions}>
-                <View style={style.actionsBar}>
-                    {renderColumn('copy', 'Copy', () => copyToClipboard())}
-                    {renderColumn('share', 'Share', () => share())}
+            <Text style={style.centered}>Scan address to receive payments</Text>
+            <View style={{flexDirection:"row",justifyContent:"space-evenly",alignItems:"center",width:"80%",alignSelf:"center"}}>
+                <View style={{flexDirection:"row",justifyContent:"space-between",backgroundColor:"#2b2b2b",width:"70%",alignSelf:"center",padding:10,borderRadius:10}}>
+                    <Text style={{color:"#fff",alignSelf:"center"}}>{address.slice(0,8)+'...'+address.slice(34,address.length)}</Text>
+                    <TouchableWithoutFeedback onPress={()=>copyToClipboard()}>
+                          <Image 
+                              source={require('../../assets/PNG/copy_white.png')}
+                              style={{height:25,width:25}}
+                            />
+                    </TouchableWithoutFeedback>
                 </View>
+                <TouchableWithoutFeedback onPress={()=>share()} >
+                  <View style={{padding:10,backgroundColor:"#2b2b2b",borderRadius:10}}>
+                        <Image 
+                            source={require('../../assets/PNG/send_white.png')}
+                            style={{height:25,width:25}}/>
+                  </View>
+                </TouchableWithoutFeedback>
             </View>
         </View>
   </Modal>
@@ -272,42 +267,6 @@ const MainInfo = gestureHandlerRootHOC(({address,navigation,name}) => {
 
 export default MainInfo;
 const style = StyleSheet.create({
-    firstView:{
-        flexDirection:"row",justifyContent:"center",alignItems:"center",width:'100%',backgroundColor:"transparent",height:100
-    },
-    secondView:{
-        width:'100%',height:"100%",justifyContent:"space-evenly",flexDirection:"column",padding:6,paddingLeft:5,backgroundColor:"#202020",
-        borderRadius:6,shadowColor: '#002147',shadowOffset: { width: 0, height: 5 },shadowOpacity: 0.34,shadowRadius: 6.27,elevation: 10
-    },
-    thirdView:{
-        alignItems:"flex-start",flexDirection:"row",justifyContent:"space-between",height:"50%",backgroundColor:"transparent"
-    },
-    fourthView:{
-        flexDirection:"column",justifyContent:"space-evenly",height:"100%",width:"60%"
-    },
-    fifthView:{
-        flex:1,height:"100%",backgroundColor:"transparent",flexDirection:"row",alignItems:"center",justifyContent:"space-evenly"
-    },
-    seventhView:{
-        flexDirection:"column",justifyContent:'space-between',alignItems:"center",backgroundColor:"transparent",width:"50%"
-    },
-    eightView:{
-        flexDirection:"row",justifyContent:"space-evenly",backgroundColor:'transparent',alignItems:"center",flex:1
-    },
-    tabBar:{
-        height: 48,backgroundColor:"#fff",width:"35%",flexDirection:"row",justifyContent:"flex-end",alignSelf:"flex-end",marginRight:10,shadowColor:"#fff"
-    },
-    text:{
-        color:"#fff",
-        flexWrap:'wrap',
-        fontSize:12
-    },
-    textLeft:{
-        color:"#fff",
-        flexWrap:'wrap',
-        fontSize:12,
-        textAlign:"left"
-    },
     orange:{
         fontSize:15,fontWeight:'bold',color:'orange'
     },
@@ -334,9 +293,10 @@ const style = StyleSheet.create({
     container: {
         backgroundColor: '#FFF',
         flex: 0.5,
-        alignItems: 'stretch',
-        justifyContent: 'space-around',
-        padding: 8
+        // alignItems: 'stretch',
+        justifyContent: 'space-evenly',
+        // padding: 10,
+        borderRadius:10
     },
     actions: {
         height: 56
@@ -359,7 +319,7 @@ const style = StyleSheet.create({
         flexDirection: 'column',
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
     centered: {
         alignSelf: 'center',
