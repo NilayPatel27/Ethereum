@@ -42,7 +42,7 @@ const SendEther = ({navigation,route}) => {
     // if (device == null) return <ActivityIndicator/>
   return (
       <>
-    <View style={{backgroundColor:"#14213D",height:"100%",width:"100%",flexDirection:"column",justifyContent:"space-between"}}>
+    <View style={{backgroundColor:"#2B2B2B",height:"100%",width:"100%",flexDirection:"column",justifyContent:"space-between"}}>
         <View>
             <View style={{height,backgroundColor:"transparent",flexDirection:"row",justifyContent:"center",marginTop:10,padding:10}}>
                 <View style={{flexDirection:"row",justifyContent:"space-between",alignItems:"center",flex:1}}>

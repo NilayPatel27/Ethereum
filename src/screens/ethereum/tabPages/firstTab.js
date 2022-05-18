@@ -50,7 +50,7 @@ const FirstTab = ({res,transaction,allAddress}) => {
                return (
                 <>
                 {/* {console.log(item.to,address)} */}
-                {item.to== allAddress[0].address.toLowerCase()
+                {item.to== allAddress[1].address.toLowerCase()
                 ?<Animated.View style={[style.firstView,
                     // { opacity,
                     // transform:[{scale}]

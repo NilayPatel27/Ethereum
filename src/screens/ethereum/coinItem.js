@@ -51,7 +51,7 @@ const CoinItem = ({ marketCoin, balance, navigation, info }) => {
         <>
             <Pressable
                 style={styles.coinContainer}
-                onPress={() => symbol.toUpperCase() ==='ETH'? navigation.navigate("WalletPage",{image}):null}
+                onPress={() => symbol.toUpperCase() ==='ETH'? navigation.navigate("WalletPage",{image}):navigation.navigate("CoinDetails",{marketCoin,ID:id})}
             >
 
                 {/* <Image style={{ height: 70, width: 70, borderRadius: 50 }} source={{ uri: image }} blurRadius={100}>

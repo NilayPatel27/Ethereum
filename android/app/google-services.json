@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "429499913247-34k5d33rac4k8va786fqhpd97uqa6mho.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ethereum",
+            "certificate_hash": "dd89b3716274d3189b38af7a9d4d1cd6a01b034b"
+          }
+        },
+        {
           "client_id": "429499913247-2d223lank875hfeinrjdtptdqdr618kb.apps.googleusercontent.com",
           "client_type": 3
         }
