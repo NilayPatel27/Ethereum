@@ -384,7 +384,7 @@ const PROVIDER = ethers.providers.getDefaultProvider('ropsten');
             style={{width: 20, height: 20}}
             source={require('../../assets/PNG/refresh.png')}/>
           </TouchableOpacity>
-          <View style={{flexDirection:"row",justifyContent:'space-evenly',alignItems:"center",flex:0.5}}>
+          <View style={{flexDirection:"row",justifyContent:'space-evenly',alignItems:"center",width:screenWidth/3,backgroundColor:"transparent",padding:10}}>
             <TouchableOpacity onPress={()=>settab(1)}>
                   <Image
                   style={{width: 20, height: 20}}

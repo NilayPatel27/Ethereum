@@ -2,22 +2,22 @@ import Test from '../test';
 import React,{useState} from 'react';
 import { view } from '../counterSlice';
 import { useDispatch } from 'react-redux';
-import HomePage from '../src/screens/homePage';
-import Ethereum from '../src/screens/ethereum';
-import BuyEther from '../src/screens/buyEther';
+import HomePage from 'screens/homePage';
+import Ethereum from 'screens/ethereum';
+import BuyEther from 'screens/buyEther';
 import {Switch, ToastAndroid} from 'react-native';
-import SendEther from '../src/screens/send/index';
-import CreateAccount from '../src/screens/createAccount';
-import ImportAccount from '../src/screens/importAccount';
-import WalletPage from '../src/screens/ethereum/accounts';
+import SendEther from 'screens/send/index';
+import CreateAccount from 'screens/createAccount';
+import ImportAccount from 'screens/importAccount';
+import WalletPage from 'screens/ethereum/accounts';
 import {NavigationContainer} from '@react-navigation/native';
-import CreateMnemonics from '../src/screens/createMnemonics';
-import CoinDetails from '../src/screens/ethereum/coinDetails';
-import ConfirmMnemonics from '../src/screens/confirmMnemonics';
-import ConfirmBox from '../src/screens/confirmMnemonics/ConfirmBox';
-import AmountPage from '../src/screens/confirmTransaction/amountPage';
+import CreateMnemonics from 'screens/createMnemonics';
+import CoinDetails from 'screens/ethereum/coinDetails';
+import ConfirmMnemonics from 'screens/confirmMnemonics';
+import ConfirmBox from 'screens/confirmMnemonics/ConfirmBox';
+import AmountPage from 'screens/confirmTransaction/amountPage';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import CofirmTransaction from '../src/screens/confirmTransaction/cofirmTransaction';
+import CofirmTransaction from 'screens/confirmTransaction/cofirmTransaction';
 
 const Stack = createNativeStackNavigator();
 
@@ -50,7 +50,7 @@ const rootNavigation = ({ loginValue }) => {
     
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName={loginValue === "true" ? 'HomePage' : 'CreateAccount'}
+        initialRouteName={loginValue === "true" ? 'Test' : 'CreateAccount'}
         screenOptions={screenOptions}>
         <Stack.Screen name="Test" component={Test} />
         <Stack.Screen name="CreateAccount" component={CreateAccount} />
