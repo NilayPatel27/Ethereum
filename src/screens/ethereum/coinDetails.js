@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import Back from '../../assets/BackButton.svg'
 import React, { useEffect, useState } from 'react';
-import { selectAddress } from '../../../counterSlice';
+// import { selectAddress } from '../../../counterSlice';
 import FilterComponent from "../ethereum/filterComponent";
 import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 import { LineChart, CandlestickChart } from "react-native-wagmi-charts";
@@ -12,7 +12,7 @@ const screenWidth = Dimensions.get('window').width;
 
 const CoinDetails = gestureHandlerRootHOC(({navigation ,route}) => {
   const { marketCoin, ID } = route.params;
-  let allAddress = useSelector(selectAddress);
+  // let allAddress = useSelector(selectAddress);
   const [res, setres] = useState(false);
   const [coin, setCoin] = useState(null);
   const [load, setload] = useState(false);
