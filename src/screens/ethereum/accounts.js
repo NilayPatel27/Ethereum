@@ -21,8 +21,11 @@ import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 import FirstTab from './tabPages/firstTab';
 import SecondTab from './tabPages/secondTab';
 import ThirdTab from './tabPages/thirdTab';
+import { useTheme } from '@react-navigation/native';
 
 const WalletPage = ({navigation,route}) => {
+  const { colors } = useTheme();
+  console.log(colors)
   const {image} = route.params;
   let allAddress = useSelector(selectAddress);
   const refRBSheet = useRef();

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { selectAddress } from '../../../counterSlice';
 import {
@@ -13,18 +13,26 @@ import CoinItem from '../ethereum/coinItem';
 import axios from 'axios';
 import ShowInfo from '../../assets/showInfo.svg';
 import HideInfo from '../../assets/hideInfo.svg';
+import { ThemeContext } from '../../Context/themeContext';
+import CoinDetails from '../ethereum/coinDetails';
 
 const HomePage = ({ navigation }) => {
+  const { back, textColor } = useContext(ThemeContext);
+
   const [totalBalance, settotalBalance] = useState(0);
   const [res, setres] = useState(false)
   const [data, setdata] = useState([])
   const [info, setInfo] = useState(true)
+  const [coins, setCoins] = useState([]);
+  const [loading, setLoading] = useState(false);
   let allAddress = useSelector(selectAddress);
 
   useEffect(() => {
+    console.log('useeffct called')
     for (let i = 0; i < allAddress.length; i++) {
       setdata(data => [...data, allAddress[i].address]);
     }
+    fetchCoins();
     setres(true);
   }, [])
 
@@ -37,8 +45,6 @@ const HomePage = ({ navigation }) => {
     });
     setres(false);
   }
-  const [coins, setCoins] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   const getMarketData = async (pageNumber = 1) => {
     try {
@@ -68,19 +74,14 @@ const HomePage = ({ navigation }) => {
     setLoading(false);
   };
 
-  useEffect(() => {
-    fetchCoins();
-  }, []);
-
-  var address = useSelector(selectAddress);
   const Header = () => {
     return (
       <>
-        <View style={{ height: 140, backgroundColor: '#2c2e3b', }} >
+        <View style={{ height: 140, backgroundColor: back}} >
           <View style={{ margin: 15, backgroundColor: '#DCDCDC', height: 110, borderRadius: 10, }}>
-            <View style={{ backgroundColor: 'rgba(52, 52, 52, 0.9)', borderTopStartRadius: 10, borderTopEndRadius: 10, justifyContent: 'space-between', flexDirection: 'row', height: 50, alignItems: 'center' }}>
+            <View style={{ backgroundColor: 'rgba(52, 52, 52, 0.9)',borderTopLeftRadius:10,borderTopRightRadius:10, justifyContent: 'space-between', flexDirection: 'row', height: 50, alignItems: 'center' }}>
               <View>
-                <Text style={{ fontSize: 20, color: '#fff', marginLeft: 15 }}>Total Amount</Text>
+                <Text style={{ fontSize: 20, color: textColor, marginLeft: 15 }}>Total Amount</Text>
               </View>
               <View style={{ marginRight: 15 }}>
                 <TouchableOpacity onPress={() => setInfo(!info)}>
@@ -108,22 +109,10 @@ const HomePage = ({ navigation }) => {
 
     )
   }
-
-  const renderItem = ({ item, index }) => {
-    return (
-      <>
-        <TouchableOpacity onPress={() => navigation.navigate('Accounts')}>
-          <View style={styles.container} key={index}>
-            <Text style={{ fontSize: 20, color: '#fff' }}>{item.name}</Text>
-            <Text style={{ fontSize: 20, color: '#fff' }}>{address.length}</Text>
-          </View>
-        </TouchableOpacity>
-      </>
-    );
-  };
   return (
     <>
-      <View style={{ flex: 1, backgroundColor: '#2c2e3b', flexDirection: 'column' }}>
+      <View style={{ flex: 1, backgroundColor: back, flexDirection: 'column' }}>
+        
         <FlatList
           data={coins}
           ListHeaderComponent={Header}

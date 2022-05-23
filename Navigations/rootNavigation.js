@@ -1,5 +1,5 @@
 import Test from '../test';
-import React,{useState} from 'react';
+import React,{useContext, useState} from 'react';
 import { view } from '../counterSlice';
 import { useDispatch } from 'react-redux';
 import HomePage from 'screens/homePage';
@@ -18,21 +18,29 @@ import ConfirmBox from 'screens/confirmMnemonics/ConfirmBox';
 import AmountPage from 'screens/confirmTransaction/amountPage';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import CofirmTransaction from 'screens/confirmTransaction/cofirmTransaction';
+import { ThemeContext } from 'src/Context/themeContext';
+import FirstScreen from 'screens/loginSignUp/FirstScreen';
+import LoginOptionScreen from 'screens/loginSignUp/LoginOptionScreen';
+import LoginPageScreen from 'screens/loginSignUp/LoginPageScreen';
+import PinVarificationScreen from 'screens/loginSignUp/PinVarificationScreen';
+import SignUpPageScreen from 'screens/loginSignUp/SignUpPageScreen';
 
 const Stack = createNativeStackNavigator();
 
-const screenOptions = {
-  headerShown: true,
-  headerTintColor: "#fff",
-  headerStyle: {
-    backgroundColor: '#2c2e3b',
-  },
-  headerTitleStyle: {
-    color: 'white',
-    fontSize: 30,
-  }
-};
 const rootNavigation = ({ loginValue }) => {
+  const { back, textColor } = useContext(ThemeContext);
+
+  const screenOptions = {
+    headerShown: false,
+    headerTintColor: "#fff",
+    headerStyle: {
+      backgroundColor: back,
+    },
+    headerTitleStyle: {
+      color: textColor,
+      fontSize: 30,
+    }
+  };
   const [isEnabled, setIsEnabled] = useState(false);
   const dispatch = useDispatch();
   const toggleSwitch = () => {
@@ -50,9 +58,14 @@ const rootNavigation = ({ loginValue }) => {
     
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName={loginValue === "true" ? 'Test' : 'CreateAccount'}
+        initialRouteName={loginValue === "true" ? 'Test' : 'FirstScreen'}
         screenOptions={screenOptions}>
         <Stack.Screen name="Test" component={Test} />
+        <Stack.Screen name="FirstScreen" component={FirstScreen} />
+        <Stack.Screen name="LoginOptionScreen" component={LoginOptionScreen} />
+        <Stack.Screen name="LoginPageScreen" component={LoginPageScreen} />
+        <Stack.Screen name="SignUpPageScreen" component={SignUpPageScreen} />
+        <Stack.Screen name="PinVarificationScreen" component={PinVarificationScreen} />
         <Stack.Screen name="CreateAccount" component={CreateAccount} />
         <Stack.Screen name="BuyEther" component={BuyEther} />
         <Stack.Screen name="SendEther" component={SendEther} />

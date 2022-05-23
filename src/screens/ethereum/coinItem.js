@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Text, View, Image, Pressable, StyleSheet, ImageBackground, ViewPropTypes } from "react-native";
 // import { AntDesign } from "@expo/vector-icons";
 // import styles from "./styles";
@@ -7,8 +7,10 @@ import { useSelector } from "react-redux";
 import { selectAddress } from "../../../counterSlice";
 import axios from "axios";
 import { transform } from "lodash";
+import { ThemeContext } from "../../Context/themeContext";
 
 const CoinItem = ({ marketCoin, balance, navigation, info }) => {
+    const { back, textColor } = useContext(ThemeContext);
 
     const {
         id,
@@ -50,30 +52,13 @@ const CoinItem = ({ marketCoin, balance, navigation, info }) => {
     return (
         <>
             <Pressable
-                style={styles.coinContainer}
-                onPress={() => symbol.toUpperCase() ==='ETH'? navigation.navigate("WalletPage",{image}):navigation.navigate("CoinDetails",{marketCoin,ID:id})}
-            >
-
-                {/* <Image style={{ height: 70, width: 70, borderRadius: 50 }} source={{ uri: image }} blurRadius={100}>
-                    <View style={styles.overlay}>
-                        <Image
-                            source={{ uri: image }}
-
-                            style={{
-                                height: 40,
-                                width: 40,
-                                // marginRight: 10,
-                                alignSelf: "center",
-                            }}
-                        />
-                    </View>
-                </Image> */}
+                style={[styles.coinContainer, { backgroundColor: back }]}
+                onPress={() => symbol.toUpperCase() ==='ETH'? navigation.navigate("WalletPage",{image}):navigation.navigate("CoinDetails",{marketCoin,ID:id})}>
                 <View style={{ height: 60, width: 60, alignItems: "center", justifyContent: "center" }}>
                     <Image style={{ height: 60, width: 60, borderRadius: 50 }} source={{ uri: image }} blurRadius={100}>
                     </Image>
                     <Image
                         source={{ uri: image }}
-
                         style={{
                             height: 40,
                             width: 40,
@@ -82,25 +67,11 @@ const CoinItem = ({ marketCoin, balance, navigation, info }) => {
                         }}
                     />
                 </View>
-
-
-
                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", flex: 1, marginLeft: 10 }}>
                     <View>
-                        <Text style={styles.title}>{symbol.toUpperCase()}</Text>
+                        <Text style={[styles.title,{ color:textColor,}]}>{symbol.toUpperCase()}</Text>
                         <View style={{ flexDirection: "row" }}>
-                            {/* <View style={styles.rankContainer}>
-                        <Text style={styles.rank}>{market_cap_rank}</Text>
-                    </View> */}
-                            {/* <Text style={styles.text}>{symbol.toUpperCase()}</Text> */}
-                            {/* <AntDesign
-            name={price_change_percentage_24h < 0 ? "caretdown" : "caretup"}
-            size={12}
-            color={percentageColor}
-            style={{ alignSelf: "center", marginRight: 5 }}
-          /> */}
                             <View style={{ alignItems: "center" }}>
-
                                 <Text style={{ color: "#969aa0" }}>
                                     MCap {normalizeMarketCap(market_cap)}
                                 </Text>
@@ -109,7 +80,7 @@ const CoinItem = ({ marketCoin, balance, navigation, info }) => {
                     </View>
 
                     <View style={{ alignItems: "center" }}>
-                        <Text style={styles.title}>${current_price}</Text>
+                        <Text style={[styles.title,{ color:textColor,}]}>${current_price}</Text>
                         <Text style={{ color: percentageColor }}>
                             {price_change_percentage_24h?.toFixed(2)}%
                         </Text>
@@ -118,12 +89,12 @@ const CoinItem = ({ marketCoin, balance, navigation, info }) => {
 
                     {info === true ?
                         <View style={{ alignItems: "center" }}>
-                            <Text style={styles.title}>0.00</Text>
+                            <Text style={[styles.title,{ color:textColor,}]}>0.00</Text>
                             <Text style={{ color: "#969aa0" }}>
                                 $0.00
                             </Text>
                         </View> : <View style={{ alignItems: "center" }}>
-                            <Text style={styles.title}>******</Text>
+                            <Text style={[styles.title,{ color:textColor,}]}>******</Text>
                         </View>}
                 </View>
             </Pressable>
@@ -140,7 +111,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     title: {
-        color: "#fff",
+       
         fontSize: 16,
         fontWeight: "bold",
         marginBottom: 3,
@@ -154,7 +125,14 @@ const styles = StyleSheet.create({
         borderBottomWidth: StyleSheet.hairlineWidth,
         borderBottomColor: "#2c2e3b",
         padding: 15,
-        backgroundColor: "#2c2e3b",
+        shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.34,
+    shadowRadius: 6.27,
+    elevation: 10,
     },
     rank: {
         fontWeight: 'bold',
